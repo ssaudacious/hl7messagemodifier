@@ -1,0 +1,201 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:component="http://gov.nist.healthcare/components">
+
+	<composite:interface>
+		<!-- Message Validation Result bean -->
+		<composite:attribute name="messageValidationResult"
+			type="gov.nist.healthcare.mu.core.report.MessageValidationResult"
+			required="true" />
+		<composite:attribute name="messageValidationFailureSelectionBean"
+			type="gov.nist.healthcare.mu.core.beans.MessageValidationFailureSelectionBean"
+			required="true" />
+		<!-- type of the module -->
+		<composite:attribute name="type" required="true" />
+		<!-- method taking care of selecting the node from the server -->
+		<composite:attribute name="selectMessageNodeListener" required="true"
+			method-signature="void selectMessageNode()" />
+		<composite:attribute name="message_tree_id" required="true" />
+		<composite:attribute name="message_editor_cursor_id" required="true" />
+		<composite:attribute name="downloader" required="true"
+			type="gov.nist.healthcare.mu.core.report.service.ReportDownloader" />
+	</composite:interface>
+	<composite:implementation>
+		<div id="#{cc.id}">
+			<ui:param name="messageValidationResult"
+				value="#{cc.attrs.messageValidationResult}" />
+			<ui:param name="failures" value="#{messageValidationResult.failures}" />
+			<ui:param name="errors" value="#{messageValidationResult.errors}" />
+			<ui:param name="warnings" value="#{messageValidationResult.warnings}" />
+			<ui:param name="alerts" value="#{messageValidationResult.alerts}" />
+			<!-- 			<ui:param name="affirmatives" value="#{messageValidationResult.affirmatives}" />
+ -->
+			<ui:param name="downloader" value="#{cc.attrs.downloader}" />
+			<h:form id="#{cc.attrs.type}_validation_form" prependId="false">
+				<span id="result_data"> </span>
+				<h:panelGroup id="#{cc.attrs.type}_validation_results_menu">
+					<p:toolbar id="#{cc.attrs.type}_validation_results_bar">
+						<p:toolbarGroup align="left">
+							<h:panelGrid columns="3">
+								<!-- 								<p:graphicImage width="15" height="15"
+									value="resources/core-images/result-icon.png" /> -->
+								<h:outputText value="Message Validation Result" />
+								<p:spacer width="10" />
+								<p:selectCheckboxMenu
+									value="#{cc.attrs.messageValidationFailureSelectionBean.selectedOptions}"
+									immediate="true" label="Settings">
+									<f:selectItems var="option" itemLabel="#{option.title}"
+										value="#{cc.attrs.messageValidationFailureSelectionBean.options}" />
+									<p:ajax update="#{cc.attrs.type}_validation_failures"
+										global="false" />
+								</p:selectCheckboxMenu>
+							</h:panelGrid>
+						</p:toolbarGroup>
+						<p:toolbarGroup align="right" rendered="#{failures != null}">
+							<h:panelGrid columns="12">
+								<p:graphicImage rendered="#{failures != null and empty errors}"
+									width="20" height="20" value="resources/core-images/valid.png" />
+								<h:outputText rendered="#{failures != null and empty errors}"
+									value="Valid" />
+								<p:graphicImage rendered="#{failures != null and !empty errors}"
+									width="20" height="20"
+									value="resources/core-images/invalid.png" />
+								<h:outputText rendered="#{failures != null and !empty errors}"
+									value="Not Valid" />
+								<p:spacer width="5" />
+								<h:panelGroup
+									rendered="#{downloader !=null and messageValidationResult != null and failures !=null}">
+									<p:commandLink ajax="false"
+										actionListener="#{downloader.downloadAsPdf(messageValidationResult)}">
+										<p:fileDownload
+											value="#{messageValidationResult.downloadFile}" />
+										<p:graphicImage title="Download as .pdf"
+											value="resources/core-images/icon_pdf.png" height="20"
+											width="20">
+										</p:graphicImage>
+									</p:commandLink>
+									<p:spacer width="5" />
+									<p:commandLink ajax="false"
+										actionListener="#{downloader.downloadAsXml(messageValidationResult)}">
+										<p:fileDownload
+											value="#{messageValidationResult.downloadFile}" />
+										<p:graphicImage title="Download as .xml"
+											value="resources/core-images/icon_xml.png" height="20"
+											width="20">
+										</p:graphicImage>
+									</p:commandLink>
+									<p:spacer width="5" />
+									<p:commandLink ajax="false"
+										actionListener="#{downloader.downloadAsDoc(messageValidationResult)}">
+										<p:fileDownload
+											value="#{messageValidationResult.downloadFile}" />
+										<p:graphicImage title="Download as .doc"
+											value="resources/core-images/icon_doc.png" height="20"
+											width="20">
+										</p:graphicImage>
+									</p:commandLink>
+									<p:spacer width="5" />
+									<p:commandLink ajax="false"
+										actionListener="#{downloader.downloadAsHtml(messageValidationResult)}">
+										<p:fileDownload
+											value="#{messageValidationResult.downloadFile}" />
+										<p:graphicImage title="Download as .html"
+											value="resources/core-images/icon_htm.png" height="20"
+											width="20">
+										</p:graphicImage>
+									</p:commandLink>
+									<p:spacer width="5" />
+								</h:panelGroup>
+								<p:commandLink
+									onclick="phtool_getManager().getModule('#{cc.attrs.type}').goNav('report');">
+									<p:graphicImage title="View Details Report"
+										value="resources/core-images/view_report.png" height="20"
+										width="20">
+									</p:graphicImage>
+								</p:commandLink>
+							</h:panelGrid>
+						</p:toolbarGroup>
+					</p:toolbar>
+				</h:panelGroup>
+				<h:panelGroup id="#{cc.attrs.type}_validation_failures"
+					rendered="#{failures != null}">
+					<p:tabView widgetVar="#{cc.attrs.type}_result_tab"
+						orientation="top"
+						value="#{cc.attrs.messageValidationFailureSelectionBean.selectedOptions}"
+						var="selectedOption" cache="false">
+						<ui:param name="displayOption"
+							value="#{cc.attrs.messageValidationFailureSelectionBean.getFailureDisplayOption(selectedOption)}" />
+						<!-- 						<ui:param name="messageFailures"
+							value="#{messageValidationResult.getFailures(selectedOption)}" />
+							 -->
+						<ui:param name="messageFailures"
+							value="#{selectedOption eq 'error' ? errors:selectedOption eq 'warning' ? warnings: selectedOption eq 'affirmative' ? affirmatives:selectedOption eq 'alert' ? alerts:selectedOption eq 'ignore' ? ignores:null}" />
+						<p:tab titleStyleClass="result-#{displayOption.type}"
+							closable="false"
+							title="#{displayOption.title} (#{fn:length(messageFailures)})">
+							<p:dataTable style="font-size:1.0em;" var="failure"
+								value="#{messageFailures}"
+								rendered="#{ not empty messageFailures}"
+								paginatorPosition="bottom" paginatorAlwaysVisible="false"
+								scrollable="false" scrollHeight="190" paginator="true" rows="5">
+								<p:column style="width:40%">
+									<f:facet name="header">
+										<h:outputText value="Description" />
+									</f:facet>
+									<h:outputText style="width:40%;" class="custom-word-wrap"
+										value="#{failure.description} #{failure.userComment}" />
+								</p:column>
+								<p:column sortBy="#{failure.line}" style="width:20%">
+									<f:facet name="header">
+										<h:outputText value="Line" />
+									</f:facet>
+									<h:outputText style="width:20%"
+										rendered="#{failure.line != -1}" value="#{failure.line}" />
+									<h:outputText style="width:20%"
+										rendered="#{failure.line == -1}" value="Not Available" />
+								</p:column>
+								<p:column style="width:20%" sortBy="#{failure.column}">
+									<f:facet name="header">
+										<h:outputText value="Column" />
+									</f:facet>
+									<h:outputText style="width:20%"
+										rendered="#{failure.column != -1}" value="#{failure.column}" />
+									<h:outputText style="width:20%"
+										rendered="#{failure.column == -1}" value="Not Available" />
+								</p:column>
+								<p:column style="width:20%" sortBy="#{failure.path}">
+									<f:facet name="header">
+										<h:outputText value="Location" />
+									</f:facet>
+									<h:panelGroup style="width:20%"
+										rendered="#{failure.column != -1 and failure.line != -1}">
+										<p:commandLink global="false"
+											action="#{cc.attrs.selectMessageNodeListener}"
+											update="#{cc.attrs.message_editor_cursor_id} #{cc.attrs.message_tree_id}"
+											oncomplete="phtool_editorHelper.getMessageEditor('#{cc.attrs.type}').selectElement()">
+											<h:outputText value="#{failure.path}" />
+											<f:param name="line" value="#{failure.line}" />
+											<f:param name="column" value="#{failure.column}" />
+											<f:param name="path" value="#{failure.path}" />
+										</p:commandLink>
+									</h:panelGroup>
+									<h:outputText style="width:20%"
+										rendered="#{failure.column == -1 or failure.line == -1}"
+										value="Not Available" />
+								</p:column>
+							</p:dataTable>
+							<h:outputText rendered="#{empty messageFailures}"
+								value="No #{displayOption.type} found." />
+						</p:tab>
+					</p:tabView>
+				</h:panelGroup>
+			</h:form>
+		</div>
+	</composite:implementation>
+</ui:composition>

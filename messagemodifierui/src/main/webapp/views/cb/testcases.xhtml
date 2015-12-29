@@ -1,0 +1,18 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions" 
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:mu="http://gov.nist.healthcare/components"
+	>
+  <mu:testcases id="#{cbConfiguration.moduleName}_testcases_layout" testCaseBean="#{cbSuiteBean.testCaseBean}" module="#{cbConfiguration.moduleName}" testCaseLoader="#{cbSuiteBean.loadTestCase()}" 
+  		validationPanel=":#{cbConfiguration.moduleName}_validation_panel"
+  		treeRoot="#{cbTestCaseTreeRoot}"
+  		selectedTestCase="#{cbSelectedTestCase}"
+  		config="#{cbConfig}"
+  
+   />
+</ui:composition>

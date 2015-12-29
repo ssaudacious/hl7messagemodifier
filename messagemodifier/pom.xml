@@ -1,0 +1,22 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>gov.nist.healthcare</groupId>
+	<artifactId>messagemodifier</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>Message Modifier</name>
+	<description>Core set of functions to modify messages</description>
+
+	<dependencies>
+		<dependency>
+			<artifactId>core-hl7-v2-parser</artifactId>
+			<groupId>gov.nist.healthcare.core</groupId>
+			<version>1.0.49</version>
+		</dependency>
+		<dependency>
+			<artifactId>core-hl7-v2-message</artifactId>
+			<groupId>gov.nist.healthcare.core</groupId>
+			<version>1.0.49</version>
+		</dependency>
+	</dependencies>
+</project>

@@ -1,0 +1,289 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+
+	<composite:interface>
+		<composite:attribute name="profileViewBean" required="true"
+			type="gov.nist.healthcare.mu.core.profile.beans.ProfileViewBean" />
+		<composite:attribute name="showDataTypeOnVaries" required="false"
+			type="java.lang.Boolean" />
+	</composite:interface>
+	<composite:implementation>
+		<!-- insert the legend -->
+		<composite:insertChildren />
+
+		<div id="#{cc.id}">
+
+			<h:panelGroup rendered="#{cc.attrs.profileViewBean.type != null}">
+				<h:panelGroup rendered="#{cc.attrs.profileViewBean.type == 'hl7'}">
+
+					<h:panelGrid columns="10">
+						<p:graphicImage width="15" height="15"
+							value="resources/core-images/group.png" />
+						<h:outputText value="Group" />
+
+						<p:graphicImage width="15" height="15"
+							value="resources/core-images/segment.png" />
+						<h:outputText value="Segment" />
+
+						<p:graphicImage width="15" height="15"
+							value="resources/core-images/field.png" />
+						<h:outputText value="Field" />
+
+						<p:graphicImage width="15" height="15"
+							value="resources/core-images/component.png" />
+						<h:outputText value="Component" />
+
+						<p:graphicImage width="15" height="15"
+							value="resources/core-images/subcomponent.png" />
+						<h:outputText value="Subcomponent" />
+					</h:panelGrid>
+
+					<br />
+
+					<h:panelGroup
+						rendered="#{fn:length(cc.attrs.profileViewBean.profilesViews) > 1}">
+						<p:tabView widgetVar="profile_widget"
+							value="#{cc.attrs.profileViewBean.profilesViews}" var="profile"
+							dynamic="false" cache="true">
+							<p:tab title="#{profile.type}">
+								<h:form prependId="false">
+									<p:selectOneRadio value="#{profile.relevance}">
+										<f:selectItem itemLabel="R,RE,C (only)" itemValue="1" />
+										<f:selectItem itemLabel="R,RE,C,O,X (All)" itemValue="0" />
+										<p:ajax process="@this" update="@form" event="change"
+											listener="#{profile.applyRelevance()}" />
+									</p:selectOneRadio>
+									<br />
+									<p:tabView value="#{profile.tabs}" var="tab" dynamic="false"
+										cache="true">
+										<p:tab title="#{tab.name}">
+											<p:treeTable id="tt" value="#{tab.root}" var="node"
+												dynamic="false" cache="true">
+
+
+												<p:column headerText="Location" style="width:250px"
+													resizable="true">
+													<p:graphicImage width="10" height="10"
+														value="resources/core-images/#{node.icon}" />
+													<p:spacer width="5" />
+													<h:outputText value="#{node.title}" />
+												</p:column>
+												<p:column headerText="Usage" style="width:10px"
+													resizable="true">
+													<h:outputText id="usage" value="#{node.usage}" />
+												</p:column>
+												<p:column headerText="Cardinality" style="width:20px"
+													resizable="true">
+													<h:outputText value="[#{node.minOccurs},#{node.maxOccurs}]"
+														rendered="#{node.minOccurs !=-1 and node.maxOccurs != 65536}" />
+													<h:outputText value="[#{node.minOccurs},*]"
+														rendered="#{node.minOccurs !=-1 and node.maxOccurs == 65536}" />
+												</p:column>
+												<p:column headerText="Data Type" style="width:50px"
+													resizable="true">
+													<h:panelGroup rendered="#{node.dataType != 'varies'}">
+														<h:outputText value="#{node.dataType}" />
+													</h:panelGroup>
+													<h:panelGroup rendered="#{node.dataType eq 'varies'}"
+														resizable="true">
+														<h:outputText value="#{node.dataType}"
+															rendered="#{!cc.attrs.showDataTypeOnVaries}" />
+														<p:commandLink ajax="true" global="true"
+															rendered="#{cc.attrs.showDataTypeOnVaries}"
+															onclick="phtool_getManager().getModule(phtool_getManager().$jsonObject.profileViewer.moduleName).goNav(phtool_getManager().$jsonObject.profileViewer.dataType.targetId); return false;"
+															value="#{node.dataType}" />
+													</h:panelGroup>
+												</p:column>
+												<p:column headerText="Length" style="width:20px"
+													resizable="true">
+													<h:outputText value="#{node.length}" />
+												</p:column>
+												<p:column headerText="Table" style="width:30px"
+													resizable="true">
+													<h:outputText value="#{node.table}" />
+												</p:column>
+												<p:column headerText="Predicate" style="width:200px"
+													resizable="true">
+													<h:outputText class="custom-word-wrap"  value="#{node.predicate}" />
+												</p:column>
+												<p:column headerText="Conformance Statement"
+													style="width:300px" resizable="true">
+													<ui:repeat value="#{node.conformanceStatement}" var="cf"
+														varStatus="status">
+														<h:outputText class="custom-word-wrap" value="#{cf.id}:#{cf.englishDescription}" />
+														<br />
+														<br />
+													</ui:repeat>
+												</p:column>
+											</p:treeTable>
+										</p:tab>
+									</p:tabView>
+
+
+
+								</h:form>
+							</p:tab>
+						</p:tabView>
+					</h:panelGroup>
+
+					<h:panelGroup
+						rendered="#{fn:length(cc.attrs.profileViewBean.profilesViews) == 1}">
+						<ui:param name="profile"
+							value="#{cc.attrs.profileViewBean.profilesViews[0]}" />
+
+						<h:form prependId="false">
+							<p:selectOneRadio value="#{profile.relevance}">
+								<f:selectItem itemLabel="R,RE,C (Only)" itemValue="1" />
+								<f:selectItem itemLabel="R,RE,C,O,X (All)" itemValue="0" />
+								<p:ajax process="@this" update="@form" event="change"
+									listener="#{profile.applyRelevance()}" />
+							</p:selectOneRadio>
+							<br />
+							<p:tabView value="#{profile.tabs}" var="tab" dynamic="false"
+								cache="true">
+								<p:tab title="#{tab.name}">
+									<p:treeTable id="tt" value="#{tab.root}" var="node"
+										dynamic="false" cache="true">
+										<p:column headerText="Location" style="width:250px"
+											resizable="true">
+											<p:graphicImage width="10" height="10"
+												value="resources/core-images/#{node.icon}" />
+											<p:spacer width="5" />
+											<h:outputText value="#{node.title}" />
+										</p:column>
+										<p:column headerText="Usage" style="width:10px"
+											resizable="true">
+											<h:outputText id="usage" value="#{node.usage}" />
+										</p:column>
+										<p:column headerText="Cardinality" style="width:20px"
+											resizable="true">
+											<h:outputText value="[#{node.minOccurs},#{node.maxOccurs}]"
+												rendered="#{node.minOccurs !=-1 and node.maxOccurs != 65536}" />
+											<h:outputText value="[#{node.minOccurs},*]"
+												rendered="#{node.minOccurs !=-1 and node.maxOccurs == 65536}" />
+										</p:column>
+										<p:column headerText="Data Type" style="width:50px"
+											resizable="true">
+											<h:panelGroup rendered="#{node.dataType != 'varies'}">
+												<h:outputText value="#{node.dataType}" />
+											</h:panelGroup>
+											<h:panelGroup rendered="#{node.dataType == 'varies'}"
+												resizable="true">
+												<h:outputText value="#{node.dataType}"
+													rendered="#{!cc.attrs.showDataTypeOnVaries}" />
+												<p:commandLink ajax="true" global="true"
+													rendered="#{cc.attrs.showDataTypeOnVaries}"
+													onclick="phtool_getManager().getModule(phtool_getManager().$jsonObject.profileViewer.moduleName).goNav(phtool_getManager().$jsonObject.profileViewer.dataType.targetId); return false;"
+													value="#{node.dataType}" />
+											</h:panelGroup>
+										</p:column>
+										<p:column headerText="Length" style="width:20px"
+											resizable="true">
+											<h:outputText value="#{node.length}" />
+										</p:column>
+										<p:column headerText="Table" style="width:30px"
+											resizable="true">
+											<h:outputText value="#{node.table}" />
+										</p:column>
+										<p:column headerText="Predicate" style="width:200px"
+											resizable="true">
+											<h:outputText value="#{node.predicate}" />
+										</p:column>
+										<p:column headerText="Conformance Statement"
+											style="width:300px" resizable="true">
+											<ui:repeat value="#{node.conformanceStatement}" var="cf"
+												varStatus="status">
+												<h:outputText value="#{cf.id}:#{cf.englishDescription}" />
+												<br />
+												<br />
+											</ui:repeat>
+										</p:column>
+									</p:treeTable>
+								</p:tab>
+							</p:tabView>
+
+
+
+						</h:form>
+
+
+
+					</h:panelGroup>
+				</h:panelGroup>
+
+				<h:panelGroup
+					rendered="#{cc.attrs.profileViewBean.type == 'schema'}">
+
+					<p:tabView widgetVar="profile_widget"
+						value="#{profileViewBean.profilesViews}" var="profile"
+						dynamic="false" cache="true">
+						<p:tab title="#{profile.type}">
+							<h:form prependId="false">
+								<br />
+
+								<p:treeTable id="tt" value="#{profile.root}" var="node"
+									dynamic="false" cache="true">
+									<p:column headerText="Name" style="width:200px"
+										resizable="true">
+										<p:graphicImage width="10" height="10"
+											value="resources/core-images/#{node.icon}"
+											rendered="#{node.icon != ''}" />
+										<p:spacer width="5" />
+										<h:outputText value="#{node.name}" />
+									</p:column>
+									<p:column headerText="Location" style="width:10px"
+										resizable="true">
+										<h:outputText value="#{node.absPath}" />
+									</p:column>
+									<p:column headerText="Cardinality" style="width:20px"
+										resizable="true">
+										<h:outputText value="[#{node.minOccurs},#{node.maxOccurs}]"
+											rendered="#{node.minOccurs != '' and node.maxOccurs!= ''}" />
+									</p:column>
+									<p:column headerText="Data Type" style="width:50px"
+										resizable="true">
+										<h:outputText value="#{node.type}" />
+									</p:column>
+									<p:column headerText="Length Range" style="width:20px"
+										resizable="true">
+										<h:outputText value="[0,#{node.maxLength}]"
+											rendered="#{node.maxLength!= null}" />
+									</p:column>
+									<p:column headerText="Pattern(s)"
+										style="width:40px;word-break:break-all;" resizable="true">
+										<h:outputText value="#{node.pattern}"
+											rendered="#{node.pattern != ''}" />
+									</p:column>
+								</p:treeTable>
+
+
+							</h:form>
+						</p:tab>
+					</p:tabView>
+				</h:panelGroup>
+
+				<h:panelGroup
+					rendered="#{cc.attrs.profileViewBean.type != 'schema' and cc.attrs.profileViewBean.type != 'hl7' }">
+					<h:outputText
+						value="Unknown Profile Type: #{cc.attrs.profileViewBean.type}. Value must be either 'hl7' or 'schema'" />
+				</h:panelGroup>
+
+			</h:panelGroup>
+
+			<h:panelGroup rendered="#{cc.attrs.profileViewBean.type == null}">
+				<h:outputText value="Profile Type not found" />
+			</h:panelGroup>
+
+
+			<br /> <br />
+
+		</div>
+
+	</composite:implementation>
+
+</ui:composition>

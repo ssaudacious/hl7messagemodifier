@@ -1,0 +1,105 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+	<composite:interface>
+ 		<composite:attribute name="moduleName" required="true" />
+		<composite:attribute name="message_tree_id" required="true" />
+		<composite:attribute name="message_validation_result_id"
+			required="true" /> 
+		<composite:attribute name="suiteManagerBean" required="true" />
+	</composite:interface>
+	<composite:implementation>
+		<div id="#{cc.id}">			
+			<div id="#{cc.attrs.moduleName}_editor_data"></div>
+			<h:form id="#{cc.attrs.moduleName}_validation_editor_form"
+				prependId="false">
+				<p:toolbar id="#{cc.attrs.moduleName}_validation_editor_bar">
+					<p:toolbarGroup align="left">
+						<h:panelGrid columns="3">
+							<h:outputText value="Message Content" />
+							<p:spacer width="2" />
+							<p:commandButton icon="ui-icon-disk"
+								id="#{cc.attrs.moduleName}_save_message_button"
+								styleClass="webkit-ui-button-hack #{saveButton}"
+								disabled="#{cc.attrs.suiteManagerBean.messageEditorBean.messageEditor.messageString == null or cc.attrs.suiteManagerBean.messageEditorBean.messageEditor.messageString == ''}"
+								actionListener="#{cc.attrs.suiteManagerBean.saveMessage}"
+								process="@form" value="Save Message" ajax="false"
+								title="Save the current message">
+								<p:fileDownload
+									value="#{cc.attrs.suiteManagerBean.testCaseBean.downloadFile}" />
+							</p:commandButton>
+
+
+						</h:panelGrid>
+					</p:toolbarGroup>
+				</p:toolbar>
+				<h:panelGroup id="#{cc.attrs.moduleName}_editor_container">
+					<pe:codeMirror id="#{cc.attrs.moduleName}_textarea"
+						value="#{cc.attrs.suiteManagerBean.messageEditorBean.messageEditor.messageString}"
+						widgetVar="#{cc.attrs.moduleName}_editor" theme="elegant"
+						lineNumbers="true" mode="#{cc.attrs.suiteManagerBean.messageEditorBean.messageEditor.mode}"
+						fixedGutter="true">
+						<p:ajax event="change" global="false"
+							onstart="phtool_editorHelper.getMessageEditor('#{cc.attrs.moduleName}').rebuild()" />
+					</pe:codeMirror>
+					<p:remoteCommand name="#{cc.attrs.moduleName}_build_all"
+						process="@form"
+						actionListener="#{cc.attrs.suiteManagerBean.build()}"
+						onstart="phtool_editorHelper.getMessageEditor('#{cc.attrs.moduleName}').formatContent();"
+						oncomplete="phtool_editorHelper.getMessageEditor('#{cc.attrs.moduleName}').parseEditor()"
+						global="true"
+						update=":#{cc.id}:#{cc.attrs.moduleName}_validation_cursor_form :#{cc.id}:#{cc.attrs.moduleName}_message_environment_form #{cc.attrs.message_tree_id} #{cc.attrs.message_validation_result_id} @form" />
+					<p:remoteCommand
+						name="#{cc.attrs.moduleName}_build_validation_and_tree"
+						process="@form"
+						actionListener="#{cc.attrs.suiteManagerBean.build()}"
+						oncomplete="phtool_editorHelper.getMessageEditor('#{cc.attrs.moduleName}').parseEditor()"
+						global="true"
+						update=":#{cc.id}:#{cc.attrs.moduleName}_validation_cursor_form :#{cc.id}:#{cc.attrs.moduleName}_message_environment_form #{cc.attrs.message_tree_id} #{cc.attrs.message_validation_result_id} #{cc.attrs.moduleName}_save_message_button" />
+					<p:remoteCommand
+						name="#{cc.attrs.moduleName}_open_message_tree_node"
+						global="false"
+						actionListener="#{cc.attrs.suiteManagerBean.openMessageNode()}"
+						update="#{cc.attrs.message_tree_id}" />
+					<p:remoteCommand
+						name="#{cc.attrs.moduleName}_deselect_message_tree_node"
+						actionListener="#{cc.attrs.suiteManagerBean.messageTreeBean.deselectNode()}"
+						update="#{cc.attrs.message_tree_id}" global="false" />
+				</h:panelGroup>
+			</h:form>
+			<h:form id="#{cc.attrs.moduleName}_validation_cursor_form"
+				prependId="false">
+				<h:inputHidden id="#{cc.attrs.moduleName}_cursor_line"
+					value="#{cc.attrs.suiteManagerBean.messageEditorBean.messageEditor.cursor.line}" />
+				<h:inputHidden id="#{cc.attrs.moduleName}_cursor_index"
+					value="#{cc.attrs.suiteManagerBean.messageEditorBean.messageEditor.cursor.index}" />
+				<h:inputHidden id="#{cc.attrs.moduleName}_cursor_segment"
+					value="#{cc.attrs.suiteManagerBean.messageEditorBean.messageEditor.cursor.segment}" />
+				<h:inputHidden id="#{cc.attrs.moduleName}_cursor_start_index"
+					value="#{cc.attrs.suiteManagerBean.messageEditorBean.messageEditor.cursor.startIndex}" />
+				<h:inputHidden id="#{cc.attrs.moduleName}_cursor_end_index"
+					value="#{cc.attrs.suiteManagerBean.messageEditorBean.messageEditor.cursor.endIndex}" />
+				<p:remoteCommand name="#{cc.attrs.moduleName}_open_text_element"
+					onstart="phtool_editorHelper.getMessageEditor('#{cc.attrs.moduleName}').setCursorPosition(true)"
+					actionListener="#{cc.attrs.suiteManagerBean.openMessageNode()}"
+					update="#{cc.attrs.message_tree_id}" process="@form" global="false" />
+			</h:form>
+			<h:form id="#{cc.attrs.moduleName}_message_environment_form"
+				prependId="false">
+				<h:inputHidden id="#{cc.attrs.moduleName}_message_separators"
+					value="#{cc.attrs.suiteManagerBean.messageEditorBean.messageEditor.separators}" />
+				<h:inputHidden id="#{cc.attrs.moduleName}_editor_mode"
+					value="#{cc.attrs.suiteManagerBean.messageEditorBean.messageEditor.mode}" />
+			</h:form>
+			<script type="text/javascript">
+				phtool_editorHelper.getMessageEditor('#{cc.attrs.moduleName}')
+						.setOnclickHandler();
+			</script>
+		</div>
+	</composite:implementation>
+</ui:composition>

@@ -1,0 +1,234 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<composite:interface>
+		<composite:attribute name="testCaseBean" required="true"
+			class="gov.nist.healthcare.mu.core.resource.testcase.CBTestCaseBeanInterface" />
+		<composite:attribute name="treeRoot" required="true"
+			class="org.primefaces.model.TreeNode" />
+		<composite:attribute name="selectedTestCase" required="true" />
+		<composite:attribute name="config" required="true"
+			class="gov.nist.healthcare.mu.core.resource.testcase.CBConfig" />
+		<composite:attribute name="module" required="true"
+			class="java.lang.String" />
+		<composite:attribute name="testCaseLoader" required="true"
+			method-signature="void loadTestCase()" />
+		<composite:attribute name="validationPanel" required="true" />
+	</composite:interface>
+	<composite:implementation>
+
+		<div id="#{cc.id}">
+			<ui:param name="module" value="#{cc.attrs.module}" />
+			<ui:param name="testCaseBean" value="#{cc.attrs.testCaseBean}" />
+			<ui:param name="testCaseLoaderBean"
+				value="#{cc.attrs.testCaseLoaderBean}" />
+			<p:layout style="width:100%;height:780px;">
+				<p:layoutUnit position="west" header="Test Cases" collapsed="false"
+					collapsible="true" size="280" scrollable="true" resizable="true"
+					minSize="260" maxSize="400">
+					<h:form id="#{module}_nist_testcases_form" prependId="false">
+ 						<p:contextMenu for="#{module}_testcases_tree" nodeType="testcase">
+							<p:menuitem value="Select" id="#{module}_testcases_tree_load_menu"
+								actionListener="#{cc.attrs.testCaseLoader}"
+								update="#{cc.attrs.validationPanel}" icon="ui-icon-play"
+								oncomplete="phtool_getManager().getModule('#{module}').loadTestCase()" />
+						</p:contextMenu>
+						<p:tree
+							style="font-size:1.0em;width:200%;height:100%; overflow:hidden;"
+ 							dynamic="false" cache="true"
+							id="#{module}_testcases_tree" value="#{cc.attrs.treeRoot}"
+ 						 	var="node" selectionMode="single"
+   							>
+							<p:ajax global="true" event="select"
+								update=":#{cc.id}:#{module}_testcases_center"
+								listener="#{testCaseBean.selectTestCase}">
+							</p:ajax>
+							<p:treeNode type="testcase">
+								<h:outputText value="#{node.title}" />
+							</p:treeNode>
+							<p:treeNode>
+								<h:outputText value="#{node.title}" />
+							</p:treeNode>
+						</p:tree>
+ 					</h:form>
+				</p:layoutUnit>
+				<p:layoutUnit position="center">
+					<h:panelGroup id="#{module}_testcases_center">
+						<h:panelGroup rendered="#{cc.attrs.selectedTestCase == null}">
+							<p:toolbar>
+								<p:toolbarGroup>
+									<p:separator style="height:20px" />
+								</p:toolbarGroup>
+							</p:toolbar>
+						</h:panelGroup>
+						<h:panelGroup
+							rendered="#{cc.attrs.selectedTestCase != null and cc.attrs.selectedTestCase.title !=null}">
+							<h:panelGroup rendered="#{!cc.attrs.selectedTestCase.hasSteps()}">
+								<p:toolbar>
+									<p:toolbarGroup align="left">
+										<h:outputText
+											value="Title: #{cc.attrs.selectedTestCase.title}" />
+									</p:toolbarGroup>
+									<p:toolbarGroup align="right">
+										<h:form id="#{module}_testcases_menu_form" prependId="false">
+											<h:panelGrid columns="3">
+												<p:commandButton styleClass="webkit-ui-button-hack"
+													rendered="#{cc.attrs.selectedTestCase.testPackagePdf !=null}"
+													value="Download Package(.pdf)"
+													icon="ui-icon-arrowreturnthick-1-s"
+													actionListener="#{testCaseBean.pdfDownloadFile(cc.attrs.selectedTestCase.testPackagePdf)}"
+													ajax="false">
+													<p:fileDownload value="#{testCaseBean.downloadFile}" />
+												</p:commandButton>
+												<p:spacer width="5" height="5" />
+
+												<p:commandButton styleClass="webkit-ui-button-hack"
+													value="Select" actionListener="#{cc.attrs.testCaseLoader}"
+													update="#{cc.attrs.validationPanel}" icon="ui-icon-play"
+													oncomplete="phtool_getManager().getModule('#{module}').loadTestCase()" />
+
+											</h:panelGrid>
+										</h:form>
+									</p:toolbarGroup>
+								</p:toolbar>
+								<p:tabView id="#{module}_testcases_content_tabs" dynamic="true">
+									<p:tab id="#{module}_test_story" title="Test Story"
+										rendered="#{cc.attrs.selectedTestCase.testStory != null}">
+
+										<h:form
+											rendered="#{cc.attrs.selectedTestCase.testStoryPdf !=null}"
+											id="#{module}_test_story_pdf_form" prependId="false">
+
+											<p:commandButton value="Download as PDF"
+												icon="ui-icon-arrowreturnthick-1-s"
+												actionListener="#{testCaseBean.pdfDownloadFile(cc.attrs.selectedTestCase.testStoryPdf)}"
+												ajax="false">
+												<p:fileDownload value="#{testCaseBean.downloadFile}" />
+											</p:commandButton>
+
+										</h:form>
+										<br />
+										<h:outputText escape="false"
+											value="#{testCaseBean.getResourceAsString(cc.attrs.selectedTestCase.testStory)}" />
+									</p:tab>
+
+									<p:tab id="#{module}_test_data_specification"
+										title="Test Data Specification"
+										rendered="#{cc.attrs.selectedTestCase.testDataSpecification != null}">
+										<h:panelGroup
+											rendered="#{cc.attrs.config !=null and cc.attrs.config.testDataSpecConfig !=null}">
+
+											<h:form id="#{module}_test_data_specification_pdf_form"
+												prependId="false">
+												<p:commandButton id="data_specification_pdf_download_button"
+													value="Download as PDF" icon="ui-icon-arrowreturnthick-1-s"
+													actionListener="#{testCaseBean.pdfDownloadFile(cc.attrs.selectedTestCase.testDataSpecificationPdf)}"
+													ajax="false">
+													<p:fileDownload value="#{testCaseBean.downloadFile}" />
+												</p:commandButton>
+											</h:form>
+											<br />
+											<p:tabView effectDuration="fast"
+												value="#{cc.attrs.config.testDataSpecConfig}" var="filter"
+												cache="false">
+												<p:tab title="#{filter.value}">
+													<h:outputText escape="false"
+														value="#{testCaseBean.getTestDataSpecificationContent(cc.attrs.selectedTestCase,filter.key)}" />
+												</p:tab>
+											</p:tabView>
+										</h:panelGroup>
+										<h:panelGroup
+											rendered="#{cc.attrs.config ==null or  cc.attrs.config.testDataSpecConfig== null or empty cc.attrs.config.testDataSpecConfig}">
+											<h:outputText value="No Filter Group found for display." />
+										</h:panelGroup>
+
+									</p:tab>
+
+
+									<p:tab id="#{module}_message_content" title="Message Content"
+										rendered="#{cc.attrs.selectedTestCase.intermediateDataSheetXML != null}">
+
+										<h:panelGroup
+											rendered="#{cc.attrs.config !=null and cc.attrs.config.messageContentConfig !=null}">
+											<h:form id="#{module}_message_content_pdf_form"
+												prependId="false">
+												<p:commandButton value="Download as PDF"
+													actionListener="#{testCaseBean.pdfDownloadFile(cc.attrs.selectedTestCase.dataSheetPdf)}"
+													ajax="false" icon="ui-icon-arrowreturnthick-1-s">
+													<p:fileDownload value="#{testCaseBean.downloadFile}" />
+												</p:commandButton>
+											</h:form>
+											<br />
+
+											<p:tabView var="seg" effectDuration="fast" cache="false"
+												value="#{cc.attrs.selectedTestCase.cachedMessageContents}">
+												<p:tab title="#{seg.name}">
+													<h:outputText escape="false"
+														rendered="#{seg.children == null}"
+														value="#{testCaseBean.getMessageContent(cc.attrs.selectedTestCase.intermediateDataSheetXML, seg.name, seg.instanceNumber)}" />
+													<p:accordionPanel var="child" value="#{seg.children}"
+														rendered="#{seg.children != null}" activeIndex="-1">
+														<p:tab title="#{child.name} - #{child.instanceNumber}">
+															<h:outputText escape="false"
+																value="#{testCaseBean.getMessageContent(cc.attrs.selectedTestCase.intermediateDataSheetXML, child.name, child.instanceNumber)}" />
+														</p:tab>
+													</p:accordionPanel>
+												</p:tab>
+											</p:tabView>
+
+										</h:panelGroup>
+
+									</p:tab>
+
+
+
+
+								</p:tabView>
+
+							</h:panelGroup>
+
+							<h:panelGroup rendered="#{cc.attrs.selectedTestCase.hasSteps()}">
+								<p:toolbar>
+									<p:toolbarGroup align="left">
+										<h:outputText
+											value="Title: #{cc.attrs.selectedTestCase.title}" />
+									</p:toolbarGroup>
+
+									<p:toolbarGroup align="right">
+										<h:form prependId="false">
+											<p:commandButton value="Download as PDF"
+												styleClass="webkit-ui-button-hack"
+												icon="ui-icon-arrowreturnthick-1-s"
+												actionListener="#{testCaseBean.pdfDownloadFile(cc.attrs.selectedTestCase.stepPackageSummaryPdf)}"
+												ajax="false">
+												<p:fileDownload value="#{testCaseBean.downloadFile}" />
+											</p:commandButton>
+
+										</h:form>
+									</p:toolbarGroup>
+
+
+								</p:toolbar>
+
+								<h:outputText escape="false"
+									value="#{testCaseBean.getResourceAsString(cc.attrs.selectedTestCase.stepPackageSummaryHtml)}" />
+
+							</h:panelGroup>
+
+						</h:panelGroup>
+
+
+
+
+					</h:panelGroup>
+				</p:layoutUnit>
+			</p:layout>
+
+		</div>
+
+	</composite:implementation>
+
+</ui:composition>

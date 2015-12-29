@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+ 
+<h:head>
+</h:head>
+<h:body>
+	<h1>Message Modifier v1.0</h1>
+	<h:form id="form0">
+	    <h:outputText value="Country: " />
+	    <p:selectOneMenu id="country" value="#{test.country}">
+	    	<f:selectItems value="#{test.countries}"></f:selectItems>
+			<p:ajax  process="country" event="change" update="cities"></p:ajax>
+	    </p:selectOneMenu>
+	    <h:outputText value="City: " />
+	    <p:selectOneMenu id="cities" value="#{test.city}">
+	    	<f:selectItems value="#{test.cities}"></f:selectItems>
+	    </p:selectOneMenu>
+	</h:form>
+	
+	<h:form id="form1">
+			<p:commandButton update=":form2:display :form0:country"
+				action="#{test.updateValue}" value="Update" />
+		</h:form>
+	<h:form id="form2">
+				<h:outputText id="display" value="#{test.value}"/>
+	</h:form>
+	
+	
+	<h:form>
+	<h:panelGrid id="customStyles">
+		<h3 style="margin-top:0;">p:selectOneMenu (fix width)</h3>
+		<p:selectOneMenu value="dummy">
+			<f:selectItem itemLabel="English" itemValue="en"/>
+			<f:selectItem itemLabel="German" itemValue="de"/>
+			<f:selectItem itemLabel="Russian" itemValue="ru"/>
+		</p:selectOneMenu>
+
+		<h3 style="margin:20px 0 0 0;">
+			p:tree (no background, no border)
+		</h3>
+		
+		<p:tree value="#{test.root}" var="node">
+			<p:treeNode>
+				<h:outputText value="#{node}"/>
+			</p:treeNode>
+		</p:tree>
+	</h:panelGrid>
+	
+<p:panel id="closeableToggleable" header="PrimeFaces" footer="The
+Cookbook" closable="true" toggleable="true" toggleSpeed="3000">
+<h:outputText value="Open Source Primefaces is the leading JSF
+Component Suite in the industry, which is adopted widely and being
+used in production ready projects around the globe." />
+</p:panel>
+
+
+<p:panel id="panelWithMenu" header="PrimeFaces" footer="The Cookbook"
+widgetVar="panel" closable="true" toggleable="true">
+<h:outputText value="Open Source Primefaces is the leading JSF
+Component Suite in the industry, which is adopted widely and being
+used in production ready projects around the globe." />
+<f:facet name="options">
+<p:menu>
+<p:submenu label="Settings">
+<p:menuitem value="Toggle" url="#" icon="ui-icon-newwin"
+onclick="panel.toggle()"/>
+<p:menuitem value="Remove" url="#" icon="ui-icon-close"
+onclick="panel.close()"/>
+</p:submenu>
+</p:menu>
+</f:facet>
+</p:panel>
+</h:form>
+</h:body>
+		
+</html>

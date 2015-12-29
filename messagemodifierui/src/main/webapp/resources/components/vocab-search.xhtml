@@ -1,0 +1,372 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+	<composite:interface>
+		<composite:attribute name="vocabSearchBean" required="true"
+			type="gov.nist.healthcare.mu.core.vocab.VocabularySearchBean" />
+		<composite:attribute name="vocabSearchContent" required="true" />
+
+	</composite:interface>
+
+	<composite:implementation>
+
+		<div id="#{cc.id}">
+
+			<h:form>
+				<p:remoteCommand name="loadTableTab" global="false"
+					update=":#{cc.id}"
+					oncomplete="phtool_getManager().getModule(phtool_getManager().$jsonObject.vocab).tab_loaded = true" />
+			</h:form>
+
+			<p:layout style="width:98%;height:700px;">
+				<p:layoutUnit header="List of Tables" position="west" size="355"
+					collapsed="false" resizable="true" collapsible="true">
+					<p:tabView value="#{cc.attrs.vocabSearchBean.vocabCollectionList}"
+						var="collection" cache="false"
+						style="width:98%;position:absolute;left:0px;top:0px;">
+						<p:tab title="#{collection.name}">
+
+							<h:panelGroup
+								rendered="#{collection.libraries != null and fn:length(collection.libraries) > 1}">
+								<p:accordionPanel value="#{collection.libraries}" var="lib"
+									cache="false" effect="hover" activeIndex="-1">
+									<p:tab title="#{lib.libraryTitle}">
+										<h:panelGroup
+											rendered="#{lib.tableList != null and lib.tableList != null}">
+											<h:form prependId="false">
+												<p:dataTable styleClass="custom-word-wrap" var="table"
+													value="#{lib.tableList}" scrollable="true"
+													scrollHeight="550" dynamic="true">
+													<p:column headerText="Table Id"
+														filterStyleClass="custom-word-wrap"
+														style="width:100px;text-align:left;"
+														sortBy="#{table.id}">
+														<p:commandLink
+															styleClass="custom-word-wrap"
+															style="margin-right:10px; width:100px;align:top"
+															action="#{lib.searchTable(table.id,table.name)}"
+															update=":#{cc.id}:vocab_result_form">
+															<f:param name="tableNumber" value="#{table.id}" />
+															<f:param name="valueSetName" value="#{table.name}" />
+															<h:outputText class="custom-word-wrap" value="#{table.id}" />
+														</p:commandLink>
+													</p:column>
+													<p:column headerText="Value Set Name"
+														filterStyleClass="custom-word-wrap"
+														style="width:200px;text-align:left;"
+														sortBy="#{table.name}">
+														<h:outputText class="custom-word-wrap" value="#{table.name}" />
+													</p:column>
+												</p:dataTable>
+											</h:form>
+										</h:panelGroup>
+									</p:tab>
+								</p:accordionPanel>
+							</h:panelGroup>
+
+							<h:panelGroup
+								rendered="#{collection.libraries != null and fn:length(collection.libraries) == 1}">
+								<ui:param name="lib" value="#{collection.libraries[0]}" />
+								<h:panelGroup
+									rendered="#{lib.tableList != null and lib.tableList != null}">
+									<h:form prependId="false">
+										<h:outputText style="font-weight:bold"
+											value="#{lib.libraryTitle}"
+											rendered="#{lib.libraryTitle !=null}" />
+										<p:dataTable styleClass="custom-word-wrap" var="table"
+											value="#{lib.tableList}" scrollable="true" scrollHeight="550"
+											dynamic="true">
+											<p:column headerText="Table Id"
+												filterStyleClass="custom-word-wrap"
+												style="width:100px;text-align:left;align:top"
+												sortBy="#{table.id}">
+												<p:commandLink
+													styleClass="custom-word-wrap"
+													style="margin-right:10px; width:100px;align:top"
+													action="#{lib.searchTable(table.id,table.name)}"
+													update=":#{cc.id}:vocab_result_form">
+													<f:param name="tableNumber" value="#{table.id}" />
+													<f:param name="valueSetName" value="#{table.name}" />
+													<h:outputText class="custom-word-wrap" value="#{table.id}" />
+												</p:commandLink>
+											</p:column>
+											<p:column headerText="Value Set Name"
+												filterStyleClass="custom-word-wrap"
+												style="width:150px;text-align:left;align:top"
+												sortBy="#{table.name}">
+												<h:outputText class="custom-word-wrap" value="#{table.name}" />
+											</p:column>
+										</p:dataTable>
+									</h:form>
+								</h:panelGroup>
+							</h:panelGroup>
+						</p:tab>
+					</p:tabView>
+
+				</p:layoutUnit>
+				<p:layoutUnit position="center" collapsible="true">
+					<p:layout>
+						<p:layoutUnit header="Value Set Information" position="center"
+							scrollable="true">
+							<h:form id="vocab_result_form" prependId="false">
+
+
+
+								<h:panelGroup id="vocab_viewDetail">
+									<h:panelGrid columns="5" cellpadding="5"
+										style="margin-bottom:10px;">
+
+
+										<p:inputText id="searchType" required="false"
+											requiredMessage=""
+											value="#{cc.attrs.vocabSearchContent.searchString}" />
+										<p:selectOneMenu
+											value="#{cc.attrs.vocabSearchContent.selectCriteria}"
+											effect="drop" style="width:150px">
+											<f:selectItem itemLabel="Table Id" itemValue="TableId" />
+											<f:selectItem itemLabel="Value (Code)" itemValue="Value" />
+											<f:selectItem itemLabel="Value Set Code"
+												itemValue="ValueSetCode" />
+											<f:selectItem itemLabel="Value Set Name"
+												itemValue="ValueSetName" />
+											<f:selectItem itemLabel="Description" itemValue="Description" />
+
+										</p:selectOneMenu>
+										<p:commandButton
+											actionListener="#{cc.attrs.vocabSearchBean.searchTableValues}"
+											update="@form" value="Search" icon="ui-icon-search">
+											<f:attribute name="searchContent"
+												value="#{cc.attrs.vocabSearchContent}" />
+										</p:commandButton>
+
+										<p:commandLink onclick="copyrightDlg.show()" value="Copyright" />
+
+
+									</h:panelGrid>
+									<h:panelGrid columns="2" style="margin-bottom:5px;border:2px;"
+										cellpadding="1">
+
+										<h:outputLabel for="displayTableId" value="Table Id:"
+											rendered="#{! empty cc.attrs.vocabSearchContent.tableNumber}" />
+										<h:outputText id="displayTableId"
+											value="#{cc.attrs.vocabSearchContent.tableNumber}"
+											rendered="#{! empty cc.attrs.vocabSearchContent.tableNumber}" />
+
+
+										<h:outputLabel for="displayValueSetName"
+											value="Value Set Name:"
+											rendered="#{! empty cc.attrs.vocabSearchContent.valueSetName}" />
+										<h:outputText id="displayValueSetName"
+											value="#{cc.attrs.vocabSearchContent.valueSetName}"
+											rendered="#{! empty cc.attrs.vocabSearchContent.valueSetName}" />
+
+										<h:outputLabel for="displayValueSetCode"
+											value="Value Set Code:"
+											rendered="#{! empty cc.attrs.vocabSearchContent.valueSetCode}" />
+										<h:outputText id="displayValueSetCode"
+											value="#{cc.attrs.vocabSearchContent.valueSetCode}"
+											rendered="#{! empty cc.attrs.vocabSearchContent.valueSetCode}" />
+
+										<h:outputLabel for="displayValueSetOID" value="Value Set OID:"
+											rendered="#{! empty cc.attrs.vocabSearchContent.valueSetOID}" />
+										<h:outputLink target="_blank" id="displayValueSetOID"
+											value="http://phinvads.cdc.gov/vads/ViewValueSet.action?oid=#{cc.attrs.vocabSearchContent.valueSetOID}"
+											rendered="#{! empty cc.attrs.vocabSearchContent.valueSetOID}">
+											<h:outputText
+												value="#{cc.attrs.vocabSearchContent.valueSetOID}" />
+										</h:outputLink>
+
+										<h:outputLabel for="displayTableType" value="Table Type:"
+											rendered="#{! empty cc.attrs.vocabSearchContent.tableType}" />
+										<h:outputText id="displayTableType"
+											value="#{cc.attrs.vocabSearchContent.tableType}"
+											rendered="#{! empty cc.attrs.vocabSearchContent.tableType}" />
+
+									</h:panelGrid>
+									<h:outputText
+										value="Table (value set) identified in the implementation guide but no codes are specified. The Validation Tool will issue an Alert since the element can’t be checked for content."
+										rendered="#{cc.attrs.vocabSearchContent.tableNumber eq 'Postal Codes' or cc.attrs.vocabSearchContent.tableNumber eq 'FIPS 6-4' or cc.attrs.vocabSearchContent.tableNumber eq 'USPS' or cc.attrs.vocabSearchContent.tableNumber eq '0361' or cc.attrs.vocabSearchContent.tableNumber eq '0362' or cc.attrs.vocabSearchContent.tableNumber eq '0363'}"
+										style="color:red; font-weight:bold;" />
+									<p:separator />
+									<br />
+
+
+									<p:messages id="msgs" showDetail="true" />
+
+									<div class="divScroll-1">
+										<p:dataTable height="375" style="font-size:1.0em;width:100%"
+											var="tableDetails"
+											value="#{cc.attrs.vocabSearchContent.tableContent}"
+											rendered="#{! empty cc.attrs.vocabSearchContent.tableContent and (cc.attrs.vocabSearchContent.searchResultsColumnCount == 2)}"
+											rowIndexVar="rowIx"
+											rowStyleClass="#{rowIx mod 2 ne 0 ? 'odd-row' : 'even-row'}">
+
+											<p:column headerText="Value (Code)"
+												sortBy="#{tableDetails[0]}" style="width:auto;">
+												<h:outputText value="#{tableDetails[0]}" />
+											</p:column>
+											<p:column headerText="Description"
+												sortBy="#{tableDetails[1]}" style="width:auto;">
+												<h:outputText value="#{tableDetails[1]}" />
+											</p:column>
+
+										</p:dataTable>
+
+
+										<p:dataTable height="450" style="font-size:1.0em;width:100%"
+											var="tableDetails"
+											value="#{cc.attrs.vocabSearchContent.tableContent}"
+											rendered="#{! empty cc.attrs.vocabSearchContent.tableContent and (cc.attrs.vocabSearchContent.searchResultsColumnCount == 3) }"
+											rowIndexVar="rowIx"
+											rowStyleClass="#{rowIx mod 2 ne 0 ? 'odd-row' : 'even-row'}">
+
+											<p:column headerText="Value (Code)"
+												sortBy="#{tableDetails[0]}" style="width:auto;">
+												<h:outputText value="#{tableDetails[0]}" />
+											</p:column>
+
+
+											<p:column headerText="Description"
+												sortBy="#{tableDetails[1]}" style="width:auto;">
+												<h:outputText value="#{tableDetails[1]}" />
+											</p:column>
+
+											<p:column headerText="CodeSys" sortBy="#{tableDetails[2]}"
+												style="width:auto;">
+												<h:outputText value="#{tableDetails[2]}" />
+											</p:column>
+
+										</p:dataTable>
+
+
+
+										<p:dataTable height="450" style="font-size:1.0em;width:100%"
+											var="searchResults"
+											value="#{cc.attrs.vocabSearchContent.searchTablesDetailContent}"
+											rendered="#{ (! empty cc.attrs.vocabSearchContent.searchTablesDetailContent) and (cc.attrs.vocabSearchContent.searchResultsColumnCount == 5)}">
+
+											<p:column style="width:100px" headerText="Source"
+												sortBy="#{searchResults[0]}">
+												<h:outputText value="#{searchResults[0]}" />
+											</p:column>
+											<p:column style="width:100px" headerText="Table Id "
+												sortBy="#{searchResults[1]}">
+												<h:outputText value="#{searchResults[1]}" />
+											</p:column>
+											<p:column style="width:auto" headerText="Value Set Name"
+												sortBy="#{searchResults[2]}">
+												<h:outputText value="#{searchResults[2]}" />
+											</p:column>
+											<p:column style="width:auto;" headerText="Value (Code)"
+												sortBy="#{searchResults[3]}">
+												<h:outputText value="#{searchResults[3]}" />
+											</p:column>
+											<p:column style="width:auto;" headerText="Description"
+												sortBy="#{searchResults[4]}">
+												<h:outputText value="#{searchResults[4]}" />
+											</p:column>
+
+										</p:dataTable>
+
+										<p:dataTable height="450" style="font-size:1.0em;width:100%"
+											var="searchResults"
+											value="#{cc.attrs.vocabSearchContent.searchTablesDetailContent}"
+											rendered="#{ (! empty cc.attrs.vocabSearchContent.searchTablesDetailContent) and (cc.attrs.vocabSearchContent.searchResultsColumnCount == 3)}">
+
+											<p:column style="width:100px" headerText="Source"
+												sortBy="#{searchResults[0]}">
+												<h:outputText value="#{searchResults[0]}" />
+											</p:column>
+											<p:column style="width:100px" headerText="Table Id "
+												sortBy="#{searchResults[1]}">
+												<h:outputText value="#{searchResults[1]}" />
+											</p:column>
+											<p:column style="width:100px" headerText="Value Set Name"
+												sortBy="#{searchResults[2]}">
+												<h:outputText value="#{searchResults[2]}" />
+											</p:column>
+
+
+										</p:dataTable>
+
+									</div>
+								</h:panelGroup>
+							</h:form>
+
+
+
+
+						</p:layoutUnit>
+					</p:layout>
+				</p:layoutUnit>
+			</p:layout>
+
+			<p:dialog widgetVar="copyrightDlg" id="copyrightDlgId"
+				header="Copyright" dynamic="false" width="1000" height="500">
+
+				<b>HL7</b>
+				<p>The HL7 Version 2.5 and 2.5.1 Messaging Standard is an
+					application protocol for electronic data exchange in healthcare. It
+					and prior versions have widespread use in the U.S. and
+					internationally. Both message formats and value sets / code tables
+					(e.g., diagnosis type, gender, patient class, result status,
+					specimen collection method, abnormal flags, observation result
+					status codes interpretation, timestamp format) are contained in the
+					standard. Visit www.hl7.org for more information</p>
+				<br />
+				<b>LOINC</b>
+				<p>This material contains content from LOINC®
+					(http://loinc.org). The LOINC table, LOINC codes, and LOINC panels
+					and forms file are copyright © 1995-2012, Regenstrief Institute,
+					Inc. and the Logical Observation Identifiers Names and Codes
+					(LOINC) Committee and available at no cost under the license at
+					http://loinc.org/terms-of-use.</p>
+				<br />
+				<b>ISO</b>
+				<p>All ISO publications are protected by copyright. Therefore
+					and unless otherwise specified, no part of an ISO publication may
+					be reproduced or utilized in any form or by any means, electronic
+					or mechanical, including photocopying, microfilm, scanning, without
+					permission in writing from the publisher.</p>
+				<p>
+					Requests should be addressed to the ISO Central Secretariat :<br />
+					ISO copyright office<br /> Case postale 56<br /> CH-1211 Geneva
+					20<br /> Tel. + 41 22 749 01 11<br /> Fax + 41 22 749 09 47<br />
+					E-mail copyright@iso.org<br /> Web www.iso.org
+				</p>
+				<b>UCUM</b>
+				<p>This product includes all or a portion of the UCUM table,
+					UCUM codes, and UCUM definitions or is derived from it, subject to
+					a license from Regenstrief Institute, Inc. and The UCUM
+					Organization. Your use of the UCUM table, UCUM codes, UCUM
+					definitions also is subject to this license, a copy of which is
+					available at http://unitsofmeasure.org. The current complete UCUM
+					table, UCUM Specification are available for download at
+					http://unitsofmeasure.org. The UCUM table and UCUM codes are
+					copyright © 1995-2009, Regenstrief Institute, Inc. and the Unified
+					Codes for Units of Measures (UCUM) Organization. All rights
+					reserved. THE UCUM TABLE (IN ALL FORMATS), UCUM DEFINITIONS, AND
+					SPECIFICATION ARE PROVIDED "AS IS." ANY EXPRESS OR IMPLIED
+					WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE
+					IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+					PURPOSE.</p>
+				<br />
+				<b>SNOMED</b>
+				<p>This material includes SNOMED Clinical Terms® (SNOMED CT®)
+					which is used by permission of the International Health Terminology
+					Standards Development Organisation (IHTSDO). All rights reserved.
+					SNOMED CT®, was originally created by The College of American
+					Pathologists. "SNOMED" and "SNOMED CT" are registered trademarks of
+					the IHTSDO.</p>
+			</p:dialog>
+
+
+
+		</div>
+	</composite:implementation>
+
+</ui:composition>

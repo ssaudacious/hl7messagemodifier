@@ -1,0 +1,51 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions" 
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:mu="http://gov.nist.healthcare/components"
+	>
+<h:panelGroup layout="block" id="home" class="page">
+  	<ui:include src="/views/overview.xhtml" /> 
+</h:panelGroup> 
+
+<ui:include src="/views/cb/cb.xhtml" />
+<ui:include src="/views/cf/cf.xhtml" />	
+
+
+<!-- PROFILE -->
+<h:panelGroup layout="block" id="profile" class="page hidden" title="Conformance Profile">
+<ui:include src="/views/profile/content.xhtml" />
+</h:panelGroup>
+
+
+<!--DATATYPE -->
+<h:panelGroup layout="block" id="datatype" class="page hidden" title="Data Type">
+<ui:include src="/views/profile/datatype.xhtml" />
+</h:panelGroup>
+
+
+<!-- TABLE -->
+<h:panelGroup layout="block" id="vocab" class="page hidden" title="Vocab">
+    <ui:include src="/views/vocab/content.xhtml" /> 
+ </h:panelGroup> 
+ 
+<!-- DOCUMENTATION -->
+<h:panelGroup layout="block" id="documentation" class="page hidden" title="Documentation">
+ 	<ui:include src="/views/doc/content.xhtml" />
+</h:panelGroup>
+
+<!-- ABOUT -->
+<h:panelGroup layout="block" id="about" class="page hidden" title="About">
+ 	<ui:include src="/views/about/content.xhtml" />  
+</h:panelGroup>
+ 
+ <!-- Setting -->
+<h:panelGroup layout="block" id="setting" class="page hidden" title="Setting">
+  	<ui:include src="/views/settings/content.xhtml" />  
+</h:panelGroup>
+ 
+</ui:composition>

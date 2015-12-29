@@ -1,0 +1,134 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+	<composite:interface>
+		<composite:attribute name="dataTypeViewBean" required="true"
+			class="gov.nist.healthcare.mu.core.datatype.DataTypeView" />
+	</composite:interface>
+
+	<composite:implementation>
+
+		<h:panelGroup rendered="#{cc.attrs.dataTypeViewBean.type != null}">
+			<h:panelGroup rendered="#{cc.attrs.dataTypeViewBean.type == 'hl7'}">
+				<h:panelGrid columns="10">
+					<p:graphicImage width="15" height="15"
+						value="resources/core-images/group.png" />
+					<h:outputText value="Group" />
+
+					<p:graphicImage width="15" height="15"
+						value="resources/core-images/segment.png" />
+					<h:outputText value="Segment" />
+
+					<p:graphicImage width="15" height="15"
+						value="resources/core-images/field.png" />
+					<h:outputText value="Field" />
+
+					<p:graphicImage width="15" height="15"
+						value="resources/core-images/component.png" />
+					<h:outputText value="Component" />
+
+					<p:graphicImage width="15" height="15"
+						value="resources/core-images/subcomponent.png" />
+					<h:outputText value="Subcomponent" />
+				</h:panelGrid>
+
+				<br />
+
+				<p:treeTable value="#{cc.attrs.dataTypeViewBean.root}" var="node">
+					<p:column headerText="Data Type" style="width:200px">
+						<p:graphicImage width="10" height="10"
+							value="resources/core-images/#{node.icon}" />
+						<p:spacer width="5" />
+						<h:outputText value="#{node.order}. #{node.dataType}" />
+					</p:column>
+					<p:column headerText="Name" style="width:150px">
+						<h:outputText value="#{node.name}" />
+					</p:column>
+					<p:column headerText="Usage" style="width:30px">
+						<h:outputText id="usage" value="#{node.dataTypeUsage}" />
+					</p:column>
+					<p:column headerText="Cardinality" style="width:70px">
+						<h:outputText value="[#{node.minOccurs},#{node.maxOccurs}]"
+							rendered="#{node.minOccurs !=-1 and node.maxOccurs != 65536 }" />
+						<h:outputText value="[#{node.minOccurs},#{node.maxOccurs}]"
+							rendered="#{node.minOccurs !=-1 and node.maxOccurs == 65536 }" />
+					</p:column>
+					<p:column headerText="Length" style="width:30px">
+						<h:outputText value="#{node.length}" />
+					</p:column>
+					<p:column headerText="Table" style="width:50px">
+						<h:outputText value="#{node.table}" />
+					</p:column>
+					<!--  
+	  		<p:column   headerText="Impl. Note" style="width:450px">
+	  			<h:outputText  value="#{node.implementationNote}" /> 
+	       	</p:column> 
+	  		<p:column  headerText="Reference" style="width:150px"> 
+     			<h:outputText  value="#{node.reference}" /> 
+	        </p:column> -->
+
+					<p:column headerText="Predicate" style="width:200px">
+						<h:outputText class="custom-word-wrap" value="#{node.predicate}" />
+					</p:column>
+					<p:column headerText="Conformance Statement" style="width:550px">
+						<h:panelGroup rendered="#{node.conformanceStatement !=null}">
+							<ui:repeat value="#{node.conformanceStatement}" var="cf"
+								varStatus="status">
+								<h:outputText class="custom-word-wrap" value="#{cf.id} : #{cf.englishDescription}" />
+								<br />
+								<br />
+							</ui:repeat>
+						</h:panelGroup>
+
+					</p:column>
+
+				</p:treeTable>
+			</h:panelGroup>
+
+			<h:panelGroup
+				rendered="#{cc.attrs.dataTypeViewBean.type == 'schema'}">
+
+				<p:treeTable value="#{cc.attrs.dataTypeViewBean.root}" var="node">
+					<p:column headerText="Pattern Name" style="width:200px">
+						<!--  	             	<p:graphicImage width="10" height="10" library="core-images" name="#{node.icon}" />
+ -->
+						<p:spacer width="5" />
+						<h:outputText value="#{node.printName}" />
+					</p:column>
+					<p:column headerText="Id" style="width:150px">
+						<h:outputText value="#{node.id}" />
+					</p:column>
+					<p:column headerText="Rule Context" style="width:30px">
+						<h:outputText value="#{node.context}" />
+					</p:column>
+					<p:column headerText="Test Condition" style="width:70px">
+						<h:outputText value="#{node.test}" />
+					</p:column>
+					<p:column headerText="Detail" style="width:50px">
+						<h:outputText value="#{node.detail}" />
+					</p:column>
+				</p:treeTable>
+			</h:panelGroup>
+			<h:panelGroup
+				rendered="#{cc.attrs.dataTypeViewBean.type ne 'schema' and cc.attrs.dataTypeViewBean.type ne 'hl7'}">
+				<h:outputText
+					value="Unknown DataType type: #{cc.attrs.dataTypeViewBean.type }" />
+			</h:panelGroup>
+
+		</h:panelGroup>
+
+
+		<h:panelGroup rendered="#{cc.attrs.dataTypeViewBean.type == null}">
+			<h:outputText value="No DataType type found." />
+		</h:panelGroup>
+
+		<br />
+		<br />
+
+	</composite:implementation>
+
+</ui:composition>

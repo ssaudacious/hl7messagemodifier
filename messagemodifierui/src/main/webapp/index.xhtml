@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:outputScript library="primefaces" name="jquery/jquery.js" />
+
+
+<h:head>
+
+	<link type="text/css" rel="stylesheet"
+		href="resources/core-css/main.css?ts=#{indexBean.ts}" />
+	<link type="text/css" rel="stylesheet"
+		href="resources/core-css/primeface.custom.css?ts=#{indexBean.ts}" />
+	<link type="text/css" rel="stylesheet"
+		href="resources/core-css/codemirror.css?ts=#{indexBean.ts}" />
+	<link type="text/css" rel="stylesheet"
+		href="resources/core-css/elegant.css?ts=#{indexBean.ts}" />
+	<script type="text/javascript"
+		src="resources/core-js/utils.js?ts=#{indexBean.ts}" />
+	<script type="text/javascript"
+		src="resources/core-js/manager.js?ts=#{indexBean.ts}" />
+	<script type="text/javascript"
+		src="resources/core-js/core.js?ts=#{indexBean.ts}" />
+	<script type="text/javascript"
+		src="resources/core-js/cb.js?ts=#{indexBean.ts}" />
+	<script type="text/javascript"
+		src="resources/core-js/cf.js?ts=#{indexBean.ts}" />
+	<script type="text/javascript"
+		src="resources/core-js/profile.js?ts=#{indexBean.ts}" />
+	<script type="text/javascript"
+		src="resources/core-js/vocab.js?ts=#{indexBean.ts}" />
+	<script type="text/javascript"
+		src="resources/core-js/settings.js?ts=#{indexBean.ts}" />
+	<script type="text/javascript"
+		src="resources/core-js/home.js?ts=#{indexBean.ts}" />
+	<script type="text/javascript"
+		src="resources/core-js/documentation.js?ts=#{indexBean.ts}" />
+	<script type="text/javascript"
+		src="resources/core-js/about.js?ts=#{indexBean.ts}" />
+	<script type="text/javascript"
+		src="resources/core-js/message_editor.js?ts=#{indexBean.ts}" />
+	<script type="text/javascript"
+		src="resources/core-js/edi.js?ts=#{indexBean.ts}" />
+	<script type="text/javascript"
+		src="resources/core-js/vkbeautify.js?ts=#{indexBean.ts}" />
+	<script type="text/javascript"
+		src="resources/core-js/xml.js?ts=#{indexBean.ts}" />
+	<script>
+		var resizeTextArea = function() {
+			$("[id='mmod:ptext']").width($("[id='mmod:west']").width());
+			$("[id='mmod:mtext']").width($("[id='mmod:center']").width());
+			$("[id='form_filenames:col1']").width($("[id='mmod:west']").width() + "px");
+			$("[id='form_filenames:col2']").width($("[id='mmod:center']").width() + "px");
+			$("[id='mmod:mtext']").focus();
+			$("[id='mmod:ptext']").focus();	
+			//var x = $(window).height() - $("#wrapper").height() - $("#footer").height());
+			//$("[id='mmod:layout']").height( x > 350 ? x : 350);
+		}
+
+		$(function() {
+			resizeTextArea();
+			$(window).resize(resizeTextArea);
+			$(window).focus(resizeTextArea);
+		});
+
+	
+	</script>
+</h:head>
+<h:body>
+	<a href="index2.xhtml"> Test</a>
+	<f:view contentType="text/html" encoding="UTF-8">
+		<h:form id="general_status_dialog_form" prependId="false">
+			<p:dialog widgetVar="general_status_dialog"
+				id="general_status_dialog_id" draggable="false" modal="true"
+				closable="false" resizable="false" header="Please wait...">
+				<p:graphicImage title="Operation in progress..."
+					value="/images/ajax-loader.gif" />
+			</p:dialog>
+		</h:form>
+
+		<p:ajaxStatus style="text-align:center;width:32px;height:32px"
+			onstart="general_status_dialog.show()"
+			onerror="general_status_dialog.hide();"
+			oncomplete="general_status_dialog.hide();" />
+
+
+		<p:growl showDetail="true" id="errorNotifier" life="30000" />
+		<div id="wrapper" class="clearfix">
+			<div class="logo">
+				<span id="tool-top"> <span id="tool-name"> Message
+						Modifier v1.0 </span> <span id="tool-description"> (BETA) </span> <br /><br/>
+				</span>
+				<div id="tool-domain">NIST HL7 V2 Utility Tool - US Realm</div>
+
+				<br />
+				<ui:include src="views/ui-comp.xhtml" />
+
+
+			</div>
+			<ul id="mainNav" class="clearfix"></ul>
+			<div id="subNavBar" class="subNavBar">
+					<h:form id="form_filenames">
+						<p:panelGrid id="filenames" style="width: 100%">
+						<p:row>
+							<p:column id="col1" style="width: 50%">
+							<p:toolbarGroup align="right">
+							<h:panelGrid columns="2">
+								
+								<h:outputText
+									value="#{messageModifierView.fProfileName}" />
+									
+							<p:commandButton styleClass="webkit-ui-button-hack"
+								onclick="profile_uploader_dialog.show()" value=""
+								title="" icon="ui-icon-folder-open" />
+								</h:panelGrid>
+								</p:toolbarGroup>
+							</p:column>
+							<p:column id="col2" style="width: 50%">
+							<p:toolbarGroup align="right">
+							<h:panelGrid columns="2">
+								
+								<h:outputText
+									value="#{messageModifierView.fMessageName}" />
+									
+							<p:commandButton styleClass="webkit-ui-button-hack"
+								onclick="message_uploader_dialog.show()" value=""
+								title="" icon="ui-icon-folder-open" />
+								</h:panelGrid>
+								</p:toolbarGroup>
+							</p:column>
+						</p:row>
+						</p:panelGrid>		
+			</h:form>
+			</div>
+			<div id="container" class="clearfix">
+			
+			
+							<h:form id="mmod">
+
+					
+
+						
+					<p:layout id="layout" style="width:100%;height:450px">
+							<p:layoutUnit id="west" position="west" 
+								resizable="true"
+								 minSize="350"
+								maxSize="450">							
+								<p:inputTextarea id="ptext" widgetVar="ptext"
+									value="#{messageModifierView.fProfileText}" 
+									 autoResize="true" />
+							</p:layoutUnit>
+							<p:layoutUnit id="center" position="center" resizable="true"
+								  
+								>							
+								<p:inputTextarea id="mtext" widgetVar="mtext"
+									value="#{messageModifierView.fMessageText}" 
+									 autoResize="true" />
+							</p:layoutUnit>
+					</p:layout>
+				
+					 
+					
+					<p:panelGrid>
+	
+						<p:row>
+							<p:column>
+								<p:panelGrid style="width:400px">
+									<p:row>
+										<p:column style="text-align: center">
+										<p:spacer height="10px"></p:spacer>
+											<p:commandButton value="MODIFY MESSAGE" ajax="false"
+												actionListener="#{messageModifierView.apply}" disabled="f" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+										</p:column>
+											
+										<p:column style="text-align: center">
+											<p:selectOneMenu id="Operation"
+												value="#{messageModifierView.operation}">
+												<f:selectItem itemLabel="Select Operation" itemValue=""
+													noSelectionOption="true" />
+												<f:selectItems value="#{messageModifierView.operations}" />
+											</p:selectOneMenu>
+										</p:column>
+										<p:column>
+											<p:inputText id="op1" value="#{messageModifierView.operand1}"
+												autoResize="false" />
+											<p:inputText id="op2"
+												value="#{messageModifierView.operand2}" autoResize="false" />
+										</p:column>
+									</p:row>
+								</p:panelGrid>
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+				</h:form>
+				<h:form id="remote_form" prependId="false">
+					<p:remoteCommand name="saveCurrentNav" global="false"
+						update="current_tab current_module" />
+					<h:inputHidden id="current_tab" value="" />
+					<h:inputHidden id="current_module" value="" />
+					<h:inputHidden id="refresh_frequency"
+						value="#{validationSettingBean.refreshFrequency}" />
+
+				</h:form>
+				<div id='tool_data'></div>
+				<div id="footer">
+					<ui:include src="views/footer.xhtml" />
+				</div>
+			</div>
+		</div>
+	</f:view>
+</h:body>
+</html>

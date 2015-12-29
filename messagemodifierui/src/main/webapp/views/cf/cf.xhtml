@@ -1,0 +1,36 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions" 
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:mu="http://gov.nist.healthcare/components"
+	>
+<h:panelGroup layout="block" id="#{cfConfiguration.moduleName}_validation" title="Context-free Validation" class="page hidden">
+    	<ui:include src="/views/cf/validation.xhtml" />
+ </h:panelGroup>
+
+<h:panelGroup layout="block" id="#{cfConfiguration.moduleName}_report" class="page hidden">
+  	   <ui:include src="/views/cf/report.xhtml" />
+  </h:panelGroup> 
+
+ <h:form id="#{cfConfiguration.moduleName}_commands_form" prependId="false">   
+  	<p:remoteCommand  name="#{cfConfiguration.moduleName}_load_validation_tab" global="false"  update=":#{cfConfiguration.moduleName}_validation_menu_form :#{cfConfiguration.moduleName}_validation_layout :#{cfConfiguration.moduleName}_message_editor:#{cfConfiguration.moduleName}_validation_cursor_form"/>
+ 
+	
+	<p:remoteCommand name="#{cfConfiguration.moduleName}_build_validation_suite" 
+					 actionListener="#{cfSuiteBean.build()}" 
+					 global="false" 
+					 update=":#{cfConfiguration.moduleName}_validation_layout" 
+					 oncomplete="phtool_editorHelper.getMessageEditor('#{cfConfiguration.moduleName}').setOnclickHandler()"/> 	
+  	<p:remoteCommand name="#{cfConfiguration.moduleName}_load_testcase" autoRun="true"
+ 					 update=":#{cfConfiguration.moduleName}_validation_menu_form"
+ 					 actionListener="#{cfSuiteBean.testCaseBean.loadTestCase()}" 
+ 					 global="true"/>		 	
+</h:form> 
+ 
+
+ 
+</ui:composition>

@@ -1,0 +1,95 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+ 
+	<composite:interface>
+		<!-- Report downloader bean -->
+		<composite:attribute name="downloader" required="true"
+			type="gov.nist.healthcare.mu.core.report.service.ReportDownloader" />
+		<composite:attribute name="messageValidationResult" required="true"
+			type="gov.nist.healthcare.mu.core.report.MessageValidationResult" />
+		<composite:attribute name="displayHtml" default="true"
+			type="java.lang.boolean" />
+		<!-- type of the module.ex cf,cb etc...Must match the validation suite type -->
+		<composite:attribute name="type" required="true" />
+		<!-- height of the icons -->
+		<composite:attribute name="iconHeight" default="25" />
+		<!-- width of the icons -->
+		<composite:attribute name="iconWidth" default="25" />
+	</composite:interface>
+	<composite:implementation>
+		<div id="#{cc.id}">
+			<ui:param name="messageValidationResult"
+				value="#{cc.attrs.messageValidationResult}" />
+			<ui:param name="downloader" value="#{cc.attrs.downloader}" />
+			<h:form prependId="false" id="#{cc.attrs.type}_report_form">
+				<p:remoteCommand name="#{cc.attrs.type}_update_report"
+					update="@form" global="true" />
+				<h:panelGroup
+					rendered="#{messageValidationResult != null and messageValidationResult.failures !=null}">
+					<table>
+						<tr>
+							<td><p:commandLink ajax="false"
+									actionListener="#{downloader.downloadAsPdf(messageValidationResult)}">
+									<p:fileDownload value="#{messageValidationResult.downloadFile}" />
+									<p:graphicImage title="Download as .pdf"
+										value="resources/core-images/pdf.png" height="25" width="25">
+									</p:graphicImage>
+								</p:commandLink></td>
+							<td><p:spacer width="15" /> <p:commandLink ajax="false"
+									actionListener="#{downloader.downloadAsXml(messageValidationResult)}">
+									<p:fileDownload value="#{messageValidationResult.downloadFile}" />
+									<p:graphicImage title="Download as .xml"
+										value="resources/core-images/xml.png" height="25" width="25">
+									</p:graphicImage>
+								</p:commandLink></td>
+							<td><p:spacer width="15" /> <p:commandLink ajax="false"
+									actionListener="#{downloader.downloadAsDoc(messageValidationResult)}">
+									<p:fileDownload value="#{messageValidationResult.downloadFile}" />
+									<p:graphicImage title="Download as .doc"
+										value="resources/core-images/doc.png" height="25" width="25">
+									</p:graphicImage>
+								</p:commandLink></td>
+							<td><p:spacer width="15" /> <p:commandLink ajax="false"
+									actionListener="#{downloader.downloadAsHtml(messageValidationResult)}">
+									<p:fileDownload value="#{messageValidationResult.downloadFile}" />
+									<p:graphicImage title="Download as .html"
+										value="resources/core-images/html.png" height="25" width="25">
+									</p:graphicImage>
+								</p:commandLink></td>
+							<td><p:spacer width="15" /> <h:commandLink
+									rendered="#{cc.attrs.displayHtml}">
+									<p:printer target="#{cc.attrs.type}_html_report" />
+									<p:graphicImage title="Print Report"
+										value="resources/core-images/printer.png" height="25"
+										width="25">
+									</p:graphicImage>
+								</h:commandLink></td>
+						</tr>
+					</table>
+					<br />
+					<h:panelGroup id="#{cc.attrs.type}_html_report">
+						<h:outputText rendered="#{cc.attrs.displayHtml}"
+							style="align:center"
+							value="#{downloader.toHTML(messageValidationResult)}"
+							escape="false" />
+					</h:panelGroup>
+				</h:panelGroup>
+				<h:panelGroup
+					rendered="#{messageValidationResult == null or messageValidationResult.failures == null}">
+					<p:commandLink
+						oncomplete="phtool_getManager().getModule('#{cc.attrs.type}').goNav('validation');">
+						<h:outputText
+							value="No Validation Performed. Please Validate to View the Report." />
+					</p:commandLink>
+				</h:panelGroup>
+			</h:form>
+		</div>
+	</composite:implementation>
+</ui:composition>
+ 

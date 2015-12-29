@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<HL7v2xConformanceProfile HL7Version="2.5.1" ProfileType="Constrainable">
+   <Encodings>
+      <Encoding>ER7</Encoding>
+   </Encodings>
+   <HL7v2xStaticDef MsgType="ORU" EventType="R01" MsgStructID="ORU_R01" OrderControl="RE" EventDesc="HL7 Version 2.5.1 Implementation Guide: Laboratory Results Interface for US Realm, Release 1" Role="Sender">
+      <Segment Name="MSH" LongName="Message Header" Usage="R" Min="1" Max="1">
+         <Field Name="Field Separator(MSG./1/1)" Usage="R" Min="1" Max="1" Datatype="LRI_ST" MaxLength="1" MinLength="1"/>
+         <Field Name="Encoding Characters(MSG./1/2)" Usage="R" Min="1" Max="1" Datatype="LRI_ST" MaxLength="5" MinLength="4"/>
+         <Field Name="Sending Application(MSG./1/3)" Usage="R" Min="1" Max="1" Datatype="LRI_HD_NG" Table="0361" MaxLength="227" MinLength="1">
+            <Component Name="Namespace ID(MSG./1/3/1)" Usage="C" Datatype="LRI_ST" MaxLength="20" MinLength="1" PredicateTrueUsage="R" PredicateFalseUsage="O"/>
+            <Component Name="Universal ID(MSG./1/3/2)" Usage="C" Datatype="LRI_ST" MaxLength="199" MinLength="1" PredicateTrueUsage="R" PredicateFalseUsage="O"/>
+            <Component Name="Universal ID Type(MSG./1/3/3)" Usage="C" Datatype="LRI_ST" Table="0301" MaxLength="6" MinLength="1" PredicateTrueUsage="O" PredicateFalseUsage="O"/>
+		 </Field>
+         <Field Name="Sending Application2" Usage="R" Min="1" Max="1" Datatype="LRI_ST"  MaxLength="227" MinLength="1"/>
+      </Segment>
+      <Segment Name="PID" LongName="S1" Usage="R" Min="1" Max="1">
+         <Field Name="Sending Application2" Usage="R" Min="1" Max="1" Datatype="LRI_ST"  MaxLength="227" MinLength="1"/>
+      </Segment>
+	  <SegGroup name="VISIT" LongName="VISIT" Usage="R" Min="1" Max="2">
+		  <Segment Name="OBR" LongName="S1" Usage="R" Min="1" Max="1">
+			 <Field Name="MSG/./3/1/1" Usage="R" Min="1" Max="1" Datatype="LRI_ST" MaxLength="227" MinLength="1"/>
+			 <Field Name="MSG/./3/1/2" Usage="R" Min="1" Max="1" Datatype="LRI_ST" MaxLength="227" MinLength="1"/>
+			 <Field Name="MSG/./3/1/3" Usage="R" Min="1" Max="1" Datatype="LRI_ST" MaxLength="227" MinLength="1"/>
+		  </Segment>
+		  <Segment Name="OBX" LongName="S1" Usage="R" Min="1" Max="10">
+			 <Field Name="MSG/./3/2/1" Usage="R" Min="1" Max="1" Datatype="LRI_ST" MaxLength="227" MinLength="1"/>
+		  </Segment>
+	  </SegGroup>
+   </HL7v2xStaticDef>
+</HL7v2xConformanceProfile>

@@ -1,0 +1,36 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions" 
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:mu="http://gov.nist.healthcare/components"
+	>
+<h:panelGroup layout="block" id="#{cbConfiguration.moduleName}_validation" class="page hidden">
+  <ui:include src="/views/cb/validation.xhtml" />
+</h:panelGroup>
+<h:panelGroup layout="block" id="#{cbConfiguration.moduleName}_tc" class="page hidden">
+    <ui:include src="/views/cb/testcases.xhtml" />   
+</h:panelGroup>  
+
+<h:panelGroup layout="block" id="#{cbConfiguration.moduleName}_report" class="page hidden">
+	   <ui:include src="/views/cb/report.xhtml" />
+</h:panelGroup> 
+
+<h:form id="#{cbConfiguration.moduleName}_commands_form" prependId="false">   
+ 	<p:remoteCommand  name="#{cbConfiguration.moduleName}_load_validation_tab"   global="false"  update=":#{cbConfiguration.moduleName}_validation_menu_form :#{cbConfiguration.moduleName}_validation_layout :#{cbConfiguration.moduleName}_message_editor:#{cbConfiguration.moduleName}_validation_cursor_form :#{cbConfiguration.moduleName}_message_editor:#{cbConfiguration.moduleName}_message_environment_form" />
+ 	<p:remoteCommand name="#{cbConfiguration.moduleName}_load_validation_tab_2" global="true" action="#{cbSuiteBean.testCaseBean.loadTestCase()}"/> 
+	<p:remoteCommand  name="#{cbConfiguration.moduleName}_load_testcase_tab"   global="false"  update=":#{cbConfiguration.moduleName}_testcases_layout" oncomplete="phtool_getManager().getModule('#{cbConfiguration.moduleName}').testcaseTabVisible=true" />
+	<p:remoteCommand name="#{cbConfiguration.moduleName}_build_validation_suite" 
+					 action="#{cbSuiteBean.build}" 
+					 global="false" 
+					 update=":#{cbConfiguration.moduleName}_validation_layout"
+	>
+	<f:attribute name="messageTree" value="cbMessageTree" />
+	<f:attribute name="messageEditor" value="cbMessageEditor" />
+	</p:remoteCommand>
+</h:form> 
+
+</ui:composition>

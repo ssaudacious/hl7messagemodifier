@@ -1,0 +1,322 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<composite:interface>
+		<composite:attribute name="documentationBean" required="true"
+			class="gov.nist.healthcare.mu.core.documentation.beans.DefaultDocumentationBean" />
+	</composite:interface>
+
+	<composite:implementation>
+			<h:form prependId="false">
+		<p:accordionPanel activeIndex="0" multiple="true" dynamic="false"
+			cache="false">
+			<p:tab title="User Documentation"
+				rendered="#{cc.attrs.documentationBean.userDocument !=null}">
+ 					<p:dataTable height="375" style="font-size:1.0em;width:100%"
+						var="documentationGen"
+						value="#{cc.attrs.documentationBean.userDocument.documentList}">
+
+						<p:column style="width:300px" headerText="Description"
+							sortBy="#{documentationGen.description}">
+							<h:outputText value="#{documentationGen.description}" />
+						</p:column>
+
+						<p:column style="width:300px" headerText="File Name/Link"
+							sortBy="#{documentationGen.name}">
+							<p:commandLink ajax="false"
+								actionListener="#{cc.attrs.documentationBean.downloadFile}"
+								value="#{documentationGen.name}"
+								rendered="#{documentationGen.path != null and !documentationGen.link and documentationGen.name != null}">
+								<f:attribute name="filePath" value="#{documentationGen.path}" />
+								<p:fileDownload
+									value="#{cc.attrs.documentationBean.downloadedFile}" />
+							</p:commandLink>
+							<h:outputLink target="_blank" value="#{documentationGen.path}"
+								rendered="#{documentationGen.path != null and documentationGen.link}">
+								<h:outputText value="#{documentationGen.path}" />
+							</h:outputLink>
+							<h:outputText value="#{documentationGen.name}"
+								rendered="#{documentationGen.path == null and !documentationGen.link and documentationGen.name !=null}" />
+						</p:column>
+
+
+					</p:dataTable>
+ 				<br />
+				<br />
+			</p:tab>
+
+			<p:tab title="Test Case Documentation"
+				rendered="#{cc.attrs.documentationBean.testCaseDocument !=null and cc.attrs.documentationBean.testCaseDocument.testCaseBean !=null and cc.attrs.documentationBean.testCaseDocument.testCaseBean.treeRoot !=null}">
+		
+					<br />
+					<h:panelGrid columns="3">
+						<p:commandButton icon="ui-icon-disk" ajax="false"
+							value="Download Complete Test Package"
+							title="Download Complete Test Package"
+							actionListener="#{cc.attrs.documentationBean.downloadFile}">
+							<f:attribute name="filePath"
+								value="#{cc.attrs.documentationBean.testCaseDocument.testPackagePath}" />
+							<p:fileDownload
+								value="#{cc.attrs.documentationBean.downloadedFile}" />
+						</p:commandButton>
+
+						<p:spacer width="2" />
+						<p:commandButton styleClass="webkit-ui-button-hack"
+							icon="ui-icon-disk" ajax="false"
+							value="Download Example Messages(.zip)"
+							title="Download Example Messages(.zip)"
+							actionListener="#{cc.attrs.documentationBean.downloadFile}">
+							<f:attribute name="filePath"
+								value="#{cc.attrs.documentationBean.testCaseDocument.allExampleMessagesPath}" />
+							<p:fileDownload
+								value="#{cc.attrs.documentationBean.downloadedFile}" />
+						</p:commandButton>
+					</h:panelGrid>
+
+					<br />
+					<br />
+					<p:treeTable
+						value="#{cc.attrs.documentationBean.testCaseDocument.testCaseBean.treeRoot}"
+						style="font-size:1.0em" var="node" cache="true">
+						<p:column style="width:auto" headerText=" Test Case Name">
+							<h:outputText value="#{node.title}" />
+						</p:column>
+						<p:column style="width:auto" headerText="Message Content">
+							<p:commandLink ajax="false"
+								actionListener="#{cc.attrs.documentationBean.downloadFile}"
+								value="#{cc.attrs.documentationBean.getFileName(node.dataSheetPdf)}"
+								rendered="#{node.dataSheetPdf != null}">
+								<f:attribute name="filePath" value="#{node.dataSheetPdf}" />
+								<p:fileDownload
+									value="#{cc.attrs.documentationBean.downloadedFile}" />
+							</p:commandLink>
+							<h:outputText value="-" rendered="#{node.dataSheet == null}" />
+						</p:column>
+
+						<p:column style="width:auto" headerText="Test Data Specification">
+							<p:commandLink ajax="false"
+								actionListener="#{cc.attrs.documentationBean.downloadFile}"
+								value="#{cc.attrs.documentationBean.getFileName(node.testDataSpecificationPdf)}"
+								rendered="#{node.testDataSpecificationPdf != null}">
+								<f:attribute name="filePath"
+									value="#{node.testDataSpecificationPdf}" />
+								<p:fileDownload
+									value="#{cc.attrs.documentationBean.downloadedFile}" />
+							</p:commandLink>
+							<h:outputText value="-"
+								rendered="#{node.testDataSpecificationPdf == null}" />
+						</p:column>
+
+						<p:column style="width:auto" headerText="Test Story">
+							<p:commandLink ajax="false"
+								actionListener="#{cc.attrs.documentationBean.downloadFile}"
+								value="#{cc.attrs.documentationBean.getFileName(node.testStoryPdf)}"
+								rendered="#{node.testStoryPdf != null}">
+								<f:attribute name="filePath" value="#{node.testStoryPdf}" />
+								<p:fileDownload
+									value="#{cc.attrs.documentationBean.downloadedFile}" />
+							</p:commandLink>
+							<h:outputText value="-" rendered="#{node.testStoryPdf== null}" />
+						</p:column>
+
+						<p:column style="width:auto" headerText="Test Package">
+							<p:commandLink ajax="false"
+								actionListener="#{cc.attrs.documentationBean.downloadFile}"
+								value="#{cc.attrs.documentationBean.getFileName(node.testPackagePdf)}"
+								rendered="#{node.testPackagePdf != null}">
+								<f:attribute name="filePath" value="#{node.testPackagePdf}" />
+								<p:fileDownload
+									value="#{cc.attrs.documentationBean.downloadedFile}" />
+							</p:commandLink>
+							<h:outputText value="-" rendered="#{node.testPackagePdf== null}" />
+						</p:column>
+
+
+						<p:column style="width:auto" headerText="Example Message">
+							<p:commandLink ajax="false"
+								actionListener="#{cc.attrs.documentationBean.downloadFile}"
+								value="#{cc.attrs.documentationBean.getFileName(node.context.messagePath)}"
+								rendered="#{node.context.messagePath != null}">
+								<f:attribute name="filePath" value="#{node.context.messagePath}" />
+								<p:fileDownload
+									value="#{cc.attrs.documentationBean.downloadedFile}" />
+							</p:commandLink>
+							<h:outputText value="-"
+								rendered="#{node.context.messagePath== null}" />
+						</p:column>
+
+						<p:column style="width:auto" headerText="Validation Context">
+							<p:commandLink ajax="false"
+								actionListener="#{cc.attrs.documentationBean.downloadFile}"
+								value="#{cc.attrs.documentationBean.getFileName(node.context.validationContextPath)}"
+								rendered="#{node.context.validationContextPath != null}">
+								<f:attribute name="filePath"
+									value="#{node.context.validationContextPath}" />
+								<p:fileDownload
+									value="#{cc.attrs.documentationBean.downloadedFile}" />
+							</p:commandLink>
+							<h:outputText value="-"
+								rendered="#{node.context.validationContextPath== null}" />
+						</p:column>
+
+						<p:column style="width:auto" headerText="Step Package Summary">
+							<p:commandLink ajax="false"
+								actionListener="#{cc.attrs.documentationBean.downloadFile}"
+								value="#{cc.attrs.documentationBean.getFileName(node.stepPackageSummaryPdf)}"
+								rendered="#{node.stepPackageSummaryPdf != null}">
+								<f:attribute name="filePath" value="#{node.stepPackageSummaryPdf}" />
+								<p:fileDownload
+									value="#{cc.attrs.documentationBean.downloadedFile}" />
+							</p:commandLink>
+							<h:outputText value="-"
+								rendered="#{node.stepPackageSummaryPdf== null}" />
+						</p:column>
+					</p:treeTable>
+ 				<br />
+				<br />
+			</p:tab>
+
+			<p:tab title="Resource Documentation"
+				rendered="#{cc.attrs.documentationBean.profileDocument !=null}">
+ 
+					<p:dataTable height="375" style="font-size:1.0em;width:100%"
+						var="documentationProfile"
+						value="#{cc.attrs.documentationBean.profileDocument.documentList}">
+
+						<p:column style="width:300px" headerText="Profile Description"
+							sortBy="#{documentationProfile.description}">
+							<h:outputText value="#{documentationProfile.description}" />
+						</p:column>
+
+						<p:column style="width:300px" headerText="File Name"
+							sortBy="#{documentationProfile.name}">
+							<p:commandLink ajax="false"
+								actionListener="#{cc.attrs.documentationBean.downloadFile}"
+								value="#{documentationProfile.name}"
+								rendered="#{documentationProfile.path != null}">
+								<f:attribute name="filePath" value="#{documentationProfile.path}" />
+								<p:fileDownload
+									value="#{cc.attrs.documentationBean.downloadedFile}" />
+							</p:commandLink>
+						</p:column>
+
+					</p:dataTable>
+					<br />
+					<p:dataTable height="375" style="font-size:1.0em;width:100%"
+						var="documentationVocab"
+						value="#{cc.attrs.documentationBean.vocabDocument.documentList}">
+
+						<p:column style="width:300px" headerText="Vocabulary Description"
+							sortBy="#{documentationVocab.description}">
+							<h:outputText value="#{documentationVocab.description}" />
+						</p:column>
+						<p:column style="width:300px" headerText="File Name"
+							sortBy="#{documentationVocab.name}">
+							<p:commandLink ajax="false"
+								actionListener="#{cc.attrs.documentationBean.downloadFile}"
+								value="#{documentationVocab.name}"
+								rendered="#{documentationVocab.path != null}">
+								<f:attribute name="filePath" value="#{documentationVocab.path}" />
+								<p:fileDownload
+									value="#{cc.attrs.documentationBean.downloadedFile}" />
+							</p:commandLink>
+						</p:column>
+
+					</p:dataTable>
+ 				<br />
+				<br />
+			</p:tab>
+
+			<p:tab title="Validation Tool Download"
+				rendered="#{cc.attrs.documentationBean.warFilesDocument !=null}">
+ 					<p:dataTable height="375" style="font-size:1.0em;width:100%"
+						var="instruction"
+						value="#{cc.attrs.documentationBean.warFilesInstructionDocument.documentList}">
+						<p:column style="width:300px"
+							headerText="Installation Instuctions Files"
+							sortBy="#{instruction.name}">
+							<p:commandLink ajax="false"
+								actionListener="#{cc.attrs.documentationBean.downloadFile}"
+								value="#{instruction.name}"
+								rendered="#{instruction.path != null}">
+								<f:attribute name="filePath" value="#{instruction.path}" />
+								<p:fileDownload
+									value="#{cc.attrs.documentationBean.downloadedFile}" />
+							</p:commandLink>
+						</p:column>
+
+					</p:dataTable>
+					<br />
+					<p:dataTable height="375" style="font-size:1.0em;width:100%"
+						var="war"
+						value="#{cc.attrs.documentationBean.warFilesDocument.documentList}">
+						<p:column style="width:300px" headerText="War Files"
+							sortBy="#{war.name}">
+							<p:commandLink ajax="false"
+								actionListener="#{cc.attrs.documentationBean.downloadExternalFile}"
+								value="#{war.name}" rendered="#{war.path != null}">
+								<f:param name="filePath" value="#{war.path}" />
+								<p:fileDownload
+									value="#{cc.attrs.documentationBean.downloadedFile}" />
+							</p:commandLink>
+						</p:column>
+					</p:dataTable>
+ 				<br />
+				<br />
+			</p:tab>
+
+			<p:tab title="Release Notes"
+				rendered="#{cc.attrs.documentationBean.logChangeDocument !=null}">
+ 					<p:dataTable var="releaseNote"
+						value="#{cc.attrs.documentationBean.logChangeDocument.documentList}">
+						<p:column headerText="Release" sortBy="#{releaseNote.version}">
+							<h:outputText value="#{releaseNote.version}" />
+						</p:column>
+
+						<p:column headerText="Date" sortBy="#{releaseNote.date}">
+							<h:outputText value="#{releaseNote.date}" />
+						</p:column>
+
+						<p:column headerText="Notes" sortBy="#{releaseNote.description}">
+							<p:commandLink ajax="false" rendered="#{releaseNote.path !=null}"
+								actionListener="#{cc.attrs.documentationBean.downloadFile}"
+								value="#{releaseNote.description}">
+								<f:attribute name="filePath" value="#{releaseNote.path}" />
+								<p:fileDownload
+									value="#{cc.attrs.documentationBean.downloadedFile}" />
+							</p:commandLink>
+							<h:outputText value="#{releaseNote.description}"
+								rendered="#{releaseNote.path == null}" />
+						</p:column>
+
+					</p:dataTable>
+ 				<br />
+				<br />
+			</p:tab>
+
+			<p:tab title="Known Issues"
+				rendered="#{cc.attrs.documentationBean.knownIssuesDocument !=null}">
+ 					<ui:repeat var="knownIssueDoc"
+						value="#{cc.attrs.documentationBean.knownIssuesDocument.documentList}">
+						<p:commandLink ajax="false"
+							actionListener="#{cc.attrs.documentationBean.downloadFile}"
+							value="#{knownIssueDoc.name}">
+							<f:attribute name="filePath" value="#{knownIssueDoc.path}" />
+							<p:fileDownload
+								value="#{cc.attrs.documentationBean.downloadedFile}" />
+						</p:commandLink>
+					</ui:repeat>
+ 				<br />
+				<br />
+			</p:tab>
+
+		</p:accordionPanel>
+		</h:form>
+		<br />
+		<br />
+
+	</composite:implementation>
+</ui:composition>

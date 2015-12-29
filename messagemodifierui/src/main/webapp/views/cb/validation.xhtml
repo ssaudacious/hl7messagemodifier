@@ -1,0 +1,142 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions" 
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:mu="http://gov.nist.healthcare/components"
+	>
+	<p:dialog  width="600" position="center" closable="true" height="200" id="#{cbConfiguration.moduleName}_validation_uploader_dialog_id" modal="true" header="Upload Message" widgetVar="#{cbConfiguration.moduleName}_validation_uploader_dialog" resizable="true"> 
+          <h:form id="#{cbConfiguration.moduleName}_validation_uploader_form" prependId="false" enctype="multipart/form-data">          
+            <p:messages id="#{cbConfiguration.moduleName}_validation_upload_message" showDetail="true"/>
+            <p:fileUpload fileUploadListener="#{cbSuiteBean.uploadMessage}" 
+           	 	label="Select Message"
+           	 	mode="advanced" 
+             	auto="true"
+             	sizeLimit="1000000"
+             	fileLimit="1"
+             	update=":#{cbConfiguration.moduleName}_message_editor:#{cbConfiguration.moduleName}_validation_editor_form :#{cbConfiguration.moduleName}_message_editor:#{cbConfiguration.moduleName}_validation_cursor_form :#{cbConfiguration.moduleName}_message_editor:#{cbConfiguration.moduleName}_message_environment_form :#{cbConfiguration.moduleName}_message_tree:#{cbConfiguration.moduleName}_validation_tree_form :#{cbConfiguration.moduleName}_message_validation_result:#{cbConfiguration.moduleName}_validation_form"
+             	oncomplete="phtool_editorHelper.getMessageEditor('#{cbConfiguration.moduleName}').setOnclickHandler();#{cbConfiguration.moduleName}_validation_uploader_dialog.hide()"
+             	invalidFileMessage="Message must an er7 message. Accepted extension(s): #{cbConfiguration.fileExtension}"
+            	/> 
+           <p:commandButton ajax="true" value="Close" oncomplete="#{cbConfiguration.moduleName}_validation_uploader_dialog.hide();"/>               
+     	</h:form>
+	</p:dialog>
+		
+	<h:panelGroup id="#{cbConfiguration.moduleName}_validation_panel">
+		<h:panelGroup rendered="#{cbTestCase.title != null}">
+			<h:form id="#{cbConfiguration.moduleName}_validation_menu_form" prependId="false">
+				<p:toolbar>
+					<p:toolbarGroup align="left">
+						<h:panelGroup id="#{cbConfiguration.moduleName}_toolbar_menu">
+							<p:commandLink id="#{cbConfiguration.moduleName}_testcase_details"
+								onclick="phtool_getManager().getModule('#{cbConfiguration.moduleName}').goNav('tc');"
+								value="Test Case:  #{cbTestCase.title}" type="button"
+								global="false" />
+						</h:panelGroup>
+					</p:toolbarGroup>
+					<p:toolbarGroup align="right">
+						<h:panelGrid columns="10">
+							<h:outputLabel for="#{cbConfiguration.moduleName}_refresh_frequency_selector"
+								value="Refresh Rate:" />
+							<p:selectOneMenu id="#{cbConfiguration.moduleName}_refresh_frequency_selector"
+								value="#{validationSettingBean.refreshFrequency}"
+								style="width:100px">
+								<f:selectItem itemLabel="1 second" itemValue="1000" />
+								<f:selectItem itemLabel="2 seconds" itemValue="2000" />
+ 								<f:selectItem itemLabel="4 seconds" itemValue="4000" />
+ 								<f:selectItem itemLabel="6 seconds" itemValue="6000" />
+ 								<f:selectItem itemLabel="8 seconds" itemValue="8000" />
+								<f:selectItem itemLabel="Disable" itemValue="2147483647" />
+								<p:ajax process="@this" update=":remote_form:refresh_frequency"
+									global="false" event="change"
+									oncomplete="phtool_editorHelper.getMessageEditor('#{cbConfiguration.moduleName}').stopAutomaticRefresh()" />
+							</p:selectOneMenu>
+							<p:spacer width="2" />
+							<p:commandButton styleClass="webkit-ui-button-hack"
+								value="Load Example" title="Load Example Message"
+								oncomplete="phtool_editorHelper.getMessageEditor('#{cbConfiguration.moduleName}').setOnclickHandler()"
+								actionListener="#{cbSuiteBean.reset()}"
+ 								icon="ui-icon-circle-triangle-e" update=":#{cbConfiguration.moduleName}_message_editor:#{cbConfiguration.moduleName}_validation_editor_form :#{cbConfiguration.moduleName}_message_editor:#{cbConfiguration.moduleName}_validation_cursor_form :#{cbConfiguration.moduleName}_message_tree:#{cbConfiguration.moduleName}_validation_tree_form :#{cbConfiguration.moduleName}_message_validation_result:#{cbConfiguration.moduleName}_validation_form :#{cbConfiguration.moduleName}_message_editor:#{cbConfiguration.moduleName}_message_environment_form" />
+							<p:spacer width="2" />
+							<p:commandButton styleClass="webkit-ui-button-hack"
+								onclick="#{cbConfiguration.moduleName}_validation_uploader_dialog.show()"
+								value="Browse Message" title="Browse" icon="ui-icon-folder-open" />
+							<p:spacer width="2" />
+							<p:commandButton styleClass="webkit-ui-button-hack" value="Clear"
+								title="clear" actionListener="#{cbSuiteBean.clear()}"
+								update=":#{cbConfiguration.moduleName}_message_editor:#{cbConfiguration.moduleName}_validation_editor_form :#{cbConfiguration.moduleName}_message_editor:#{cbConfiguration.moduleName}_validation_cursor_form :#{cbConfiguration.moduleName}_message_tree:#{cbConfiguration.moduleName}_validation_tree_form :#{cbConfiguration.moduleName}_message_validation_result:#{cbConfiguration.moduleName}_validation_form :#{cbConfiguration.moduleName}_message_editor:#{cbConfiguration.moduleName}_message_environment_form"
+								oncomplete="phtool_editorHelper.getMessageEditor('#{cbConfiguration.moduleName}').setOnclickHandler()"
+								icon="ui-icon-circle-close" />
+
+							<p:spacer width="2" />
+							<p:commandButton styleClass="webkit-ui-button-hack"
+								value="Refresh" title="Refresh"
+								actionListener="${cbSuiteBean.build()}"
+								oncomplete="phtool_editorHelper.getMessageEditor('#{cbConfiguration.moduleName}').setOnclickHandler()"
+								icon="ui-icon-refresh"
+								update=":#{cbConfiguration.moduleName}_message_editor:#{cbConfiguration.moduleName}_validation_editor_form :#{cbConfiguration.moduleName}_message_editor:#{cbConfiguration.moduleName}_validation_cursor_form :#{cbConfiguration.moduleName}_message_tree:#{cbConfiguration.moduleName}_validation_tree_form :#{cbConfiguration.moduleName}_message_validation_result:#{cbConfiguration.moduleName}_validation_form :#{cbConfiguration.moduleName}_message_editor:#{cbConfiguration.moduleName}_message_environment_form" />
+
+
+						</h:panelGrid>
+					</p:toolbarGroup>
+				</p:toolbar>
+			</h:form>
+
+			<p:layout id="#{cbConfiguration.moduleName}_validation_layout"
+				style="width:100%;height:675px;">
+				<p:layoutUnit position="west" size="350" scrollable="true"
+					collapsed="false" collapsible="true" resizable="true" minSize="350"
+					maxSize="450">
+					<mu:message-tree id="#{cbConfiguration.moduleName}_message_tree" type="cb"
+						style="width:550px;"
+						message_editor_cursor_id=":#{cbConfiguration.moduleName}_message_editor:#{cbConfiguration.moduleName}_validation_cursor_form"
+						messageTree="#{cbMessageTree}"
+						messageEditorBean="#{cbSuiteBean.messageEditorBean}" />
+
+				</p:layoutUnit>
+				<p:layoutUnit position="center" collapsible="true">
+					<p:layout>
+						<p:layoutUnit position="center">
+							<mu:message-editor id="#{cbConfiguration.moduleName}_message_editor"
+								suiteManagerBean="#{cbSuiteBean}"
+								moduleName="#{cbConfiguration.moduleName}"
+ 								style="width:680px; height:300px"
+   								message_tree_id=":#{cbConfiguration.moduleName}_message_tree:#{cbConfiguration.moduleName}_validation_tree_form"
+								message_validation_result_id=":#{cbConfiguration.moduleName}_message_validation_result:#{cbConfiguration.moduleName}_validation_form">
+							</mu:message-editor>
+						</p:layoutUnit>
+						<p:layoutUnit position="south" size="360">
+							<mu:message-validation-result
+								id="#{cbConfiguration.moduleName}_message_validation_result"
+								messageValidationResult="#{cbMessageValidationResult}"
+								messageValidationFailureSelectionBean="#{validationSettingBean}"
+								type="#{cbConfiguration.moduleName}"
+								selectMessageNodeListener="#{cbSuiteBean.selectMessageNode()}"
+								message_editor_cursor_id=":#{cbConfiguration.moduleName}_message_editor:#{cbConfiguration.moduleName}_validation_cursor_form"
+								message_tree_id=":#{cbConfiguration.moduleName}_message_tree:#{cbConfiguration.moduleName}_validation_tree_form"
+								downloader="#{reportDownloader}">
+							</mu:message-validation-result>
+							
+						</p:layoutUnit>
+					</p:layout>
+				</p:layoutUnit>
+			</p:layout>
+
+		</h:panelGroup>
+
+
+		<h:panelGroup rendered="#{cbTestCase.title == null}">
+			<h:form>
+				<p:commandLink
+					oncomplete="phtool_getManager().getModule('#{cbConfiguration.moduleName}').goNav('tc');">
+					<h:outputText
+						value="No Test Case Selected. Please Select a Test Case." />
+				</p:commandLink>
+			</h:form>
+		</h:panelGroup>
+	</h:panelGroup>
+
+</ui:composition>

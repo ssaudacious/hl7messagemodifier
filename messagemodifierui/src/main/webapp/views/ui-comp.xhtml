@@ -1,0 +1,49 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:mu="http://gov.nist.healthcare/components">
+
+	<p:dialog width="600" position="center" closable="true" height="200"
+		id="message_uploader_dialog_id" modal="true" header="Upload Message"
+		widgetVar="message_uploader_dialog" resizable="true">
+		<h:form id="message_uploader_form" prependId="false"
+			enctype="multipart/form-data">
+			<p:messages id="message_upload_message" showDetail="true" />
+			<p:fileUpload
+				fileUploadListener="#{messageModifierView.uploadMessage}"
+				label="Select Message" mode="advanced" auto="true"
+				sizeLimit="1000000" fileLimit="1" 
+				update=":mmod:mtext"
+				oncomplete="resizeTextArea();"
+				invalidFileMessage="Message must an er7 message. Accepted extension(s): #{cbConfiguration.fileExtension}" />
+			<p:commandButton ajax="true" value="Close"
+				oncomplete="message_uploader_dialog.hide();" />
+		</h:form>
+	</p:dialog>
+
+
+	<p:dialog width="600" position="center" closable="true" height="200"
+		id="profile_uploader_dialog_id" modal="true" header="Upload Profile"
+		widgetVar="profile_uploader_dialog" resizable="true">
+		<h:form id="profile_uploader_form" prependId="false"
+			enctype="multipart/form-data">
+			<p:messages id="profile_upload_message" showDetail="true" />
+			<p:fileUpload
+				fileUploadListener="#{messageModifierView.uploadProfile}"
+				label="Select Profile" mode="advanced" auto="true"
+				sizeLimit="1000000" fileLimit="1" 
+				update=":mmod:ptext"
+				oncomplete="resizeTextArea();"
+				invalidFileMessage="Message must an er7 message. Accepted extension(s): #{cbConfiguration.fileExtension}" />
+			<p:commandButton ajax="true" value="Close"
+				oncomplete="profile_uploader_dialog.hide();" />
+		</h:form>
+	</p:dialog>
+
+
+</ui:composition>

@@ -1,0 +1,57 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+ 
+	<composite:interface>
+		<!-- Message tree bean -->
+		<composite:attribute name="messageTree" required="true"
+			type="gov.nist.healthcare.mu.core.message.tree.MessageTree" />
+		<!-- Message editor bean. 
+ 			 This should be replaced later when bugs in primefaces is fixed.
+ 			 It is currently not possible to set a method as a listener to a p:ajax component 
+ 			 without specifying the bean containing the method
+ 		  -->
+		<composite:attribute name="messageEditorBean" required="true" />
+		<!-- Type of the module. cf, cb etc... -->
+		<composite:attribute name="type" required="true" />
+		<!-- css style of the tree -->
+		<composite:attribute name="style" default="width:370px" />
+ 		<composite:attribute name="message_editor_cursor_id" required="true" />
+	</composite:interface>
+	<composite:implementation>
+		<div id="#{cc.id}">
+			<h:form id="#{cc.attrs.type}_validation_tree_form" prependId="false">
+				<p:toolbar id="#{cc.attrs.type}_validation_tree_bar"
+					style="#{cc.attrs.style}">
+					<p:toolbarGroup align="left">
+						<h:panelGrid columns="1">
+<!-- 							<p:graphicImage width="15" height="15"
+								value="resources/core-images/tree-icon.png" /> -->
+							<h:outputText value="Message Tree" />
+						</h:panelGrid>
+					</p:toolbarGroup>
+					<!-- insert menu options here -->
+					<composite:insertChildren />
+				</p:toolbar>
+				<h:panelGroup id="#{cc.attrs.type}_validation_tree">
+					<p:tree value="#{cc.attrs.messageTree.root}" var="node"
+						style="#{cc.attrs.style}" selectionMode="single"
+						selection="#{cc.attrs.messageTree.selectedNode}">
+						<p:ajax global="false"
+							oncomplete="phtool_editorHelper.getMessageEditor('#{cc.attrs.type}').selectElement()"
+							event="select" update="#{cc.attrs.message_editor_cursor_id}"
+							listener="#{cc.attrs.messageEditorBean.onNodeSelect}" />
+						<p:treeNode>
+							<h:outputText value="#{node}" />
+						</p:treeNode>
+					</p:tree>
+				</h:panelGroup>
+			</h:form>
+		</div>
+	</composite:implementation>
+ </ui:composition>
