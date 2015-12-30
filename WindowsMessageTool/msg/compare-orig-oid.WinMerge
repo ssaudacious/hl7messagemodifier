@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+   <paths>
+      <left>C:\Users\sna10\DEV\Source\java\dqa\WindowsMessageTool\msg\ORIGINAL-ONC-TestPlan2015\</left>
+      <right>C:\Users\sna10\DEV\Source\java\dqa\WindowsMessageTool\msg\OUTPUT-with-OID-ONC-TestPlan2015\</right>
+      <filter>Message.txt</filter>
+      <subfolders>1</subfolders>
+      <left-readonly>0</left-readonly>
+      <right-readonly>0</right-readonly>
+   </paths>
+</project>

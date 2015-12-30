@@ -119,7 +119,7 @@
 		<dependency>
 			<groupId>org.immunizationsoftware.dqa</groupId>
 			<artifactId>tester</artifactId>
-			<version>1.36</version>
+			<version>1.41</version>
 		</dependency>
 		<dependency>
 			<groupId>gov.nist.healthcare.mu</groupId>

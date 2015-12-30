@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>org.immunizationsoftware.dqa</groupId>
+  <artifactId>tester</artifactId>
+  <versioning>
+    <release>1.41</release>
+    <versions>
+      <version>1.36</version>
+      <version>1.41</version>
+    </versions>
+    <lastUpdated>20150527141745</lastUpdated>
+  </versioning>
+</metadata>
